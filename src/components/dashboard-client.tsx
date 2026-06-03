@@ -345,9 +345,12 @@ export default function DashboardClient({
       <header className="border-b border-[#c6cfed] bg-white/80 backdrop-blur-md sticky top-0 z-20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <span className="text-lg font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-              Focus Flow
-            </span>
+            <Link
+              href="/dashboard"
+              className="font-sans font-semibold text-2xl tracking-tight text-[#4F65A2]/80 hover:text-[#4F65A2] transition-colors inline-flex items-center leading-none"
+            >
+              FocusFlow
+            </Link>
             <nav className="hidden md:flex items-center gap-1">
               <Link
                 href="/global-stats"

@@ -15,7 +15,7 @@ const caveat = Caveat({
 
 export const metadata: Metadata = {
   title: "FocusFlow - Master Your Time",
-  description: "A free, simple tool to log your work and build better habits.",
+  description: "A free, simple tool to log your work and build habits.",
 };
 
 export default function RootLayout({
