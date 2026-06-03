@@ -23,12 +23,12 @@ export default function InteractiveParticles() {
       color: string;
     }> = [];
 
-    // Colors matching the FocusFlow aesthetic: soft coral, blue-indigo, peach, and lavender
+    // Colors matching the FocusFlow aesthetic: purple, gold, soft lavender, and cream yellow glow
     const colors = [
-      "rgba(177, 155, 149, 0.28)", // #B19B95
-      "rgba(79, 100, 162, 0.28)",  // #4f64a2
-      "rgba(203, 188, 185, 0.28)", // #CBBCB9
-      "rgba(198, 207, 237, 0.35)"   // lavender glow
+      "rgba(184, 141, 21, 0.28)",  // #B88D15 (Gold)
+      "rgba(123, 82, 171, 0.28)",  // #7B52AB (Purple)
+      "rgba(234, 219, 247, 0.28)", // #EADBF7 (Soft lavender)
+      "rgba(250, 246, 227, 0.35)"  // #FAF6E3 (Cream yellow glow)
     ];
 
     let targetScrollY = typeof window !== "undefined" ? window.scrollY : 0;
@@ -78,7 +78,7 @@ export default function InteractiveParticles() {
 
           if (dist < 120) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(198, 207, 237, ${0.18 * (1 - dist / 120)})`;
+            ctx.strokeStyle = `rgba(123, 82, 171, ${0.18 * (1 - dist / 120)})`;
             ctx.lineWidth = 0.8;
             ctx.moveTo(particles[a].x, particles[a].y);
             ctx.lineTo(particles[b].x, particles[b].y);
