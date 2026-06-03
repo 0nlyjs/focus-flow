@@ -122,7 +122,7 @@ export default function Home() {
           {/* Ambient Glow */}
           <div className="absolute -inset-4 bg-gradient-to-tr from-[#B88D15]/25 to-[#7B52AB]/30 rounded-[3rem] blur-3xl opacity-75 group-hover:opacity-95 transition-opacity duration-500 -z-10" />
 
-          <div className="bg-white/40 p-3 rounded-[2.5rem] border border-white/50 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full max-w-lg flex flex-col justify-center items-center relative animate-float transition-all duration-500 hover:shadow-[0_20px_50px_rgba(184,141,21,0.3)]">
+          <div className="bg-[#FAF6E3]/40 p-3 rounded-[2.5rem] border border-[#B88D15]/20 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full max-w-lg flex flex-col justify-center items-center relative animate-float transition-all duration-500 hover:shadow-[0_20px_50px_rgba(184,141,21,0.3)]">
             <div className="w-full h-full relative overflow-hidden rounded-[1.8rem] shadow-inner">
               <Image
                 src="/hero_girl.png"
@@ -189,7 +189,7 @@ export default function Home() {
             {/* Ambient Glow */}
             <div className="absolute -inset-4 bg-gradient-to-tr from-[#7B52AB]/25 to-[#B88D15]/30 rounded-[3rem] blur-3xl opacity-75 group-hover:opacity-95 transition-opacity duration-500 -z-10" />
 
-            <div className="bg-white/40 p-3 rounded-[2.5rem] border border-white/50 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full max-w-md flex flex-col justify-center items-center relative animate-float-delayed transition-all duration-500 hover:shadow-[0_20px_50px_rgba(123,82,171,0.3)]">
+            <div className="bg-[#FAF6E3]/40 p-3 rounded-[2.5rem] border border-[#B88D15]/20 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full max-w-md flex flex-col justify-center items-center relative animate-float-delayed transition-all duration-500 hover:shadow-[0_20px_50px_rgba(123,82,171,0.3)]">
               <div className="w-full h-full relative overflow-hidden rounded-[1.8rem] shadow-inner">
                 <Image
                   src="/cat_playing.png"
@@ -199,7 +199,7 @@ export default function Home() {
                 />
               </div>
               {/* Overlay Label */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/90 px-5 py-1.5 rounded-full border border-white/60 backdrop-blur-md shadow-md select-none opacity-90 hover:opacity-100 transition-opacity duration-300">
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-[#FAF6E3]/90 px-5 py-1.5 rounded-full border border-[#B88D15]/20 backdrop-blur-md shadow-md select-none opacity-90 hover:opacity-100 transition-opacity duration-300">
                 <p className="font-caveat text-[1.65rem] text-[#B88D15] leading-none whitespace-nowrap">
                   Play with the kittens
                 </p>
@@ -258,7 +258,7 @@ export default function Home() {
             {/* Ambient Glow */}
             <div className="absolute -inset-4 bg-gradient-to-tr from-[#B88D15]/25 to-[#7B52AB]/30 rounded-[3rem] blur-3xl opacity-75 group-hover:opacity-95 transition-opacity duration-500 -z-10" />
 
-            <div className="bg-white/40 p-3 rounded-[2.5rem] border border-white/50 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full max-w-md flex flex-col justify-center items-center relative animate-float transition-all duration-500 hover:shadow-[0_20px_50px_rgba(184, 141, 21, 0.3)]">
+            <div className="bg-[#FAF6E3]/40 p-3 rounded-[2.5rem] border border-[#B88D15]/20 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full max-w-md flex flex-col justify-center items-center relative animate-float transition-all duration-500 hover:shadow-[0_20px_50px_rgba(184, 141, 21, 0.3)]">
               <div className="w-full h-full relative overflow-hidden rounded-[1.8rem] shadow-inner">
                 <Image
                   src="/sitting_cat.png"
@@ -520,7 +520,7 @@ export default function Home() {
       {/* Login Modal Overlay */}
       {isLoginOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-2xl max-w-md w-full relative">
+          <div className="bg-[#FFFDF5] p-8 rounded-[2rem] border border-[#B88D15]/20 shadow-2xl max-w-md w-full relative">
             <button
               onClick={() => setIsLoginOpen(false)}
               className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-slate-800 hover:bg-slate-50 transition-all"
@@ -529,7 +529,7 @@ export default function Home() {
             </button>
 
             <div className="flex flex-col items-center gap-4 text-center">
-              <div className="p-3.5 rounded-2xl bg-orange-50/50 text-[#B88D15] border border-[#EADBF7]/40">
+              <div className="p-3.5 rounded-2xl bg-[#7B52AB]/15 text-[#7B52AB] border border-[#7B52AB]/20">
                 <Sparkles className="w-6 h-6" />
               </div>
               <div>
@@ -553,7 +553,7 @@ export default function Home() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7B52AB]/30 focus:border-[#7B52AB] transition-all text-sm font-bold shadow-sm"
+                  className="w-full px-4 py-3 rounded-2xl border border-[#7B52AB]/20 bg-[#FAF6E3]/30 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7B52AB]/30 focus:border-[#7B52AB] transition-all text-sm font-bold shadow-sm"
                 />
                 <button
                   type="submit"
@@ -571,7 +571,7 @@ export default function Home() {
                 <form action={handleGuestLogin}>
                   <button
                     type="submit"
-                    className="w-full flex items-center justify-center gap-2 bg-white/30 hover:bg-white/55 border border-white/50 text-slate-755 font-extrabold py-3 px-4 rounded-2xl transition-all text-xs uppercase tracking-wider shadow-sm backdrop-blur-sm"
+                    className="w-full flex items-center justify-center gap-2 bg-[#FAF6E3] hover:bg-[#FAF6E3]/80 border border-[#7B52AB]/20 text-[#3E2361] font-extrabold py-3 px-4 rounded-2xl transition-all text-xs uppercase tracking-wider shadow-sm"
                   >
                     Continue as Guest
                   </button>

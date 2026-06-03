@@ -1,12 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FAF6E3;
+  --foreground: #3E2361;
 }
 
 html {
   font-size: 90% !important;
+}
+
+::selection {
+  background-color: rgba(123, 82, 171, 0.2);
+  color: #3E2361;
 }
 
 @theme inline {
@@ -18,8 +23,8 @@ html {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #FAF6E3;
+    --foreground: #3E2361;
   }
 }
 
