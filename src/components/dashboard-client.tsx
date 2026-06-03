@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Clock,
   Trash2,
@@ -16,6 +17,9 @@ import {
   Flame,
   RotateCcw,
   Sparkles,
+  Music,
+  SkipForward,
+  SkipBack,
 } from "lucide-react";
 import { createTask } from "@/app/actions/task-actions";
 
@@ -37,6 +41,14 @@ interface DashboardClientProps {
   isGuest?: boolean;
 }
 
+const INSPIRATIONAL_QUOTES = [
+  "You can do it beautiful",
+  "You are doing great love",
+  "Take it easy, you got this",
+  "Focus flow, girl!",
+  "Make today cozy and focus",
+];
+
 export default function DashboardClient({
   user,
   initialTasks,
@@ -54,8 +66,17 @@ export default function DashboardClient({
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentQuote, setCurrentQuote] = useState(INSPIRATIONAL_QUOTES[0]);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Rotate quotes every focus session
+  useEffect(() => {
+    if (activeTask) {
+      const randomIndex = Math.floor(Math.random() * INSPIRATIONAL_QUOTES.length);
+      setCurrentQuote(INSPIRATIONAL_QUOTES[randomIndex]);
+    }
+  }, [activeTask]);
 
   // Sync tasks when initialTasks changes (only for authenticated users)
   useEffect(() => {
@@ -315,24 +336,24 @@ export default function DashboardClient({
   const strokeDashoffset = 283 - (283 * progressPercent) / 100;
 
   return (
-    <div className="relative min-h-screen bg-sky-50/50 text-slate-800 font-sans flex flex-col justify-between selection:bg-blue-500 selection:text-white">
-      {/* Background soft blue/indigo glows */}
-      <div className="absolute top-[-10%] left-[-10%] h-[600px] w-[600px] rounded-full bg-blue-200/50 blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-sky-200/50 blur-[130px] pointer-events-none" />
+    <div className="relative min-h-screen bg-[#dce3f8] text-slate-800 font-sans flex flex-col justify-between selection:bg-[#f2a893] selection:text-white">
+      {/* Background glows */}
+      <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-blue-100/50 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-sky-100/50 blur-[120px] pointer-events-none" />
 
       {/* Header */}
-      <header className="border-b border-blue-200 bg-white/80 backdrop-blur-md sticky top-0 z-20 shadow-sm">
+      <header className="border-b border-[#c6cfed] bg-white/80 backdrop-blur-md sticky top-0 z-20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <span className="text-lg font-extrabold tracking-tight bg-gradient-to-r from-blue-900 to-blue-700 bg-clip-text text-transparent">
+            <span className="text-lg font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
               Focus Flow
             </span>
             <nav className="hidden md:flex items-center gap-1">
               <Link
                 href="/global-stats"
-                className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm text-slate-700 hover:text-blue-900 hover:bg-blue-50 transition-colors font-bold"
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/50 transition-colors font-bold"
               >
-                <BarChart3 className="w-4 h-4 text-blue-600" />
+                <BarChart3 className="w-4 h-4 text-[#e07f67]" />
                 Global Stats
               </Link>
             </nav>
@@ -340,7 +361,7 @@ export default function DashboardClient({
 
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex flex-col text-right">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-600">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#e07f67]">
                 {isGuest ? "Sandbox Mode" : "Registered Member"}
               </span>
               <span className="text-sm font-bold text-slate-700 truncate max-w-[200px]">
@@ -349,9 +370,9 @@ export default function DashboardClient({
             </div>
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg border border-blue-200 bg-white hover:bg-slate-50 text-sm text-slate-700 font-extrabold transition-all shadow-sm"
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm text-slate-700 font-extrabold transition-all shadow-sm"
             >
-              <LogOut className="w-4 h-4 text-blue-600" />
+              <LogOut className="w-4 h-4 text-[#e07f67]" />
               <span>Leave Session</span>
             </button>
           </div>
@@ -360,95 +381,113 @@ export default function DashboardClient({
 
       {/* Main Container */}
       <div className="flex-1 flex overflow-hidden max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 gap-8 relative z-10 items-stretch">
+        
         {/* Main Workspace */}
         <div className="flex-1 flex flex-col gap-8 transition-all duration-300">
           {activeTask ? (
-            /* Active Focus Timer state */
-            <div className="flex-1 flex flex-col items-center justify-center p-8 rounded-2xl border border-blue-200 bg-white/70 backdrop-blur-xl shadow-xl relative overflow-hidden">
-              <div className="absolute top-[-30%] left-[-20%] h-[400px] w-[400px] rounded-full bg-blue-100/40 blur-[100px]" />
-              <div className="absolute bottom-[-30%] right-[-20%] h-[400px] w-[400px] rounded-full bg-sky-100/40 blur-[100px]" />
-
-              <div className="z-10 flex flex-col items-center gap-6 text-center max-w-lg">
-                <div className="px-3.5 py-1.5 rounded-full border border-blue-200 bg-blue-50 text-blue-800 text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-                  <Flame className="w-3.5 h-3.5 text-blue-600 animate-bounce" />
-                  Focusing: {timeMode === "countdown" ? "Countdown" : "Count Up"}
+            /* Active Focus Timer State (Aesthetic Music Player Dial Style) */
+            <div className="flex-1 flex flex-col items-center justify-center p-8 rounded-3xl border border-slate-100 bg-white shadow-xl relative overflow-hidden">
+              <div className="absolute top-[-30%] left-[-20%] h-[400px] w-[400px] rounded-full bg-[#fcf5f3] blur-[100px]" />
+              
+              <div className="z-10 flex flex-col items-center gap-5 text-center max-w-lg">
+                
+                {/* Handwritten Cozy Encouragement Text */}
+                <div className="font-caveat text-4xl text-[#e07f67] animate-pulse py-1">
+                  {currentQuote}
                 </div>
 
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
                   {activeTask.title}
                 </h2>
 
-                {/* Animated Circular Timer */}
-                <div className="relative w-64 h-64 flex items-center justify-center">
+                {/* Animated Clock Circle Dial */}
+                <div className="relative w-60 h-60 flex items-center justify-center bg-slate-50 rounded-full border border-slate-100 shadow-inner">
                   <svg className="absolute w-full h-full -rotate-90">
                     <circle
-                      cx="128"
-                      cy="128"
-                      r="110"
-                      className="stroke-slate-200/80 fill-none"
-                      strokeWidth="8"
+                      cx="120"
+                      cy="120"
+                      r="102"
+                      className="stroke-slate-200/50 fill-none"
+                      strokeWidth="6"
+                      transform="translate(8, 8)"
                     />
                     <circle
-                      cx="128"
-                      cy="128"
-                      r="110"
-                      className="stroke-blue-600 fill-none transition-all duration-1000 ease-linear"
-                      strokeWidth="8"
-                      strokeDasharray="691"
-                      strokeDashoffset={timeMode === "countdown" ? 691 - (691 * progressPercent) / 100 : strokeDashoffset}
+                      cx="120"
+                      cy="120"
+                      r="102"
+                      className="stroke-[#e07f67] fill-none transition-all duration-1000 ease-linear"
+                      strokeWidth="6"
+                      strokeDasharray="640"
+                      strokeDashoffset={timeMode === "countdown" ? 640 - (640 * progressPercent) / 100 : strokeDashoffset}
                       strokeLinecap="round"
+                      transform="translate(8, 8)"
                     />
                   </svg>
+                  
+                  {/* Digital Clock reading */}
                   <div className="flex flex-col items-center z-10">
-                    <span className="text-5xl sm:text-6xl font-black tracking-tight text-slate-950 font-mono">
+                    <span className="text-5xl font-black tracking-tight text-slate-900 font-mono">
                       {formatTime(displayTime)}
                     </span>
-                    <span className="text-xs text-slate-700 mt-2 font-bold tracking-wide">
-                      Target: {activeTask.allocatedTime || "∞"}m | Elapsed: {formatTime(secondsElapsed)}
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-2">
+                      Elapsed: {formatTime(secondsElapsed)}
                     </span>
                   </div>
                 </div>
 
-                {/* Timer Actions */}
-                <div className="flex items-center gap-4 mt-4 w-full">
-                  {timerState === "running" ? (
-                    <button
-                      onClick={() => setTimerState("paused")}
-                      className="flex-1 flex items-center justify-center gap-2 bg-white border border-blue-200 hover:bg-slate-50 text-slate-700 font-extrabold py-3 px-6 rounded-xl transition-all shadow-sm"
-                    >
-                      <Pause className="w-5 h-5 text-slate-500" />
-                      Pause Timer
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setTimerState("running")}
-                      className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3 px-6 rounded-xl shadow-lg shadow-blue-500/20 transition-all"
-                    >
-                      <Play className="w-5 h-5 fill-current" />
-                      Resume Focus
-                    </button>
-                  )}
+                {/* Cute music Lo-fi controls bar */}
+                <div className="p-3 w-64 rounded-full bg-[#faf5f3] border border-[#f5e4e0] flex items-center justify-between shadow-inner">
+                  <button
+                    onClick={() => {
+                      if (confirm("Cancel session? Focus progress will not be saved.")) {
+                        setActiveTask(null);
+                        setTimerState("idle");
+                        setSecondsRemaining(0);
+                        setSecondsElapsed(0);
+                      }
+                    }}
+                    className="p-1.5 rounded-full text-slate-400 hover:text-rose-500 transition-colors"
+                    title="Cancel Focus"
+                  >
+                    <SkipBack className="w-4 h-4 fill-current" />
+                  </button>
+
+                  <div className="flex items-center gap-3">
+                    {timerState === "running" ? (
+                      <button
+                        onClick={() => setTimerState("paused")}
+                        className="p-2.5 rounded-full bg-[#f2a893] text-white hover:bg-[#e07f67] shadow-sm transition-all"
+                        title="Pause Timer"
+                      >
+                        <Pause className="w-5 h-5 fill-current" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setTimerState("running")}
+                        className="p-2.5 rounded-full bg-[#e07f67] text-white hover:bg-[#d6725b] shadow-sm transition-all animate-bounce"
+                        title="Resume Timer"
+                      >
+                        <Play className="w-5 h-5 fill-current" />
+                      </button>
+                    )}
+                  </div>
+
                   <button
                     onClick={handleFinishActive}
-                    className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-650 hover:from-emerald-700 hover:to-teal-705 text-white font-extrabold py-3 px-6 rounded-xl shadow-lg shadow-emerald-500/20 transition-all"
+                    className="p-1.5 rounded-full text-emerald-600 hover:text-emerald-700 transition-colors"
+                    title="Finish Task"
                   >
-                    <CheckCircle2 className="w-5 h-5" />
-                    Finish Task
+                    <SkipForward className="w-4 h-4 fill-current" />
                   </button>
                 </div>
 
+                {/* Main Action Button */}
                 <button
-                  onClick={() => {
-                    if (confirm("Cancel session? Focus progress will not be saved.")) {
-                      setActiveTask(null);
-                      setTimerState("idle");
-                      setSecondsRemaining(0);
-                      setSecondsElapsed(0);
-                    }
-                  }}
-                  className="text-xs text-slate-600 hover:text-rose-600 font-bold transition-colors mt-2"
+                  onClick={handleFinishActive}
+                  className="mt-2 w-full flex items-center justify-center gap-2 bg-[#e07f67] hover:bg-[#d6725b] text-white font-extrabold py-3 px-6 rounded-2xl shadow-lg transition-all"
                 >
-                  Cancel Focus Session
+                  <CheckCircle2 className="w-5 h-5" />
+                  Finish Focus Block
                 </button>
               </div>
             </div>
@@ -456,10 +495,10 @@ export default function DashboardClient({
             /* Config & Form Creation State */
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Form Card */}
-              <div className="lg:col-span-7 p-6 sm:p-8 rounded-2xl border border-blue-200 bg-white/70 backdrop-blur-xl shadow-xl flex flex-col gap-6">
-                <div className="flex items-center gap-2 text-blue-700">
+              <div className="lg:col-span-7 p-6 sm:p-8 rounded-3xl border border-slate-100 bg-white shadow-xl flex flex-col gap-6">
+                <div className="flex items-center gap-2 text-[#e07f67]">
                   <Sparkles className="w-5 h-5" />
-                  <h2 className="text-xl font-extrabold text-blue-900 tracking-tight">Create Focus Block</h2>
+                  <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">Create Focus Block</h2>
                 </div>
 
                 {formError && (
@@ -479,7 +518,7 @@ export default function DashboardClient({
                       id="title"
                       required
                       placeholder="e.g. Designing mockup, Writing docs..."
-                      className="px-4 py-3 rounded-xl border border-blue-200 bg-white/60 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm font-bold shadow-sm"
+                      className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#f2a893]/30 focus:border-[#f2a893] transition-all text-sm font-bold shadow-sm"
                     />
                   </div>
 
@@ -493,7 +532,7 @@ export default function DashboardClient({
                           id="timeMode"
                           value={timeMode}
                           onChange={(e) => setTimeMode(e.target.value as "countdown" | "countup")}
-                          className="w-full px-4 py-3 rounded-xl border border-blue-200 bg-white/60 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm font-bold appearance-none cursor-pointer shadow-sm"
+                          className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#f2a893]/30 focus:border-[#f2a893] transition-all text-sm font-bold appearance-none cursor-pointer shadow-sm"
                         >
                           <option value="countdown">Countdown Mode</option>
                           <option value="countup">Count Up Mode</option>
@@ -515,7 +554,7 @@ export default function DashboardClient({
                         max="180"
                         defaultValue="25"
                         disabled={timeMode === "countup"}
-                        className="px-4 py-3 rounded-xl border border-blue-200 bg-white/60 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm font-bold shadow-sm"
+                        className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#f2a893]/30 focus:border-[#f2a893] transition-all text-sm font-bold shadow-sm"
                       />
                     </div>
                   </div>
@@ -523,7 +562,7 @@ export default function DashboardClient({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-blue-500/10 hover:shadow-blue-500/25 transition-all disabled:opacity-70 group text-sm uppercase tracking-wider"
+                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#e07f67] to-[#f2a893] hover:from-[#d6725b] hover:to-[#e59580] text-white font-extrabold py-3 px-4 rounded-2xl shadow-lg transition-all disabled:opacity-70 group text-sm uppercase tracking-wider"
                   >
                     {isSubmitting ? "Creating..." : "Start Focus Session"}
                     <Play className="w-4 h-4 fill-white transition-transform group-hover:scale-105" />
@@ -531,7 +570,7 @@ export default function DashboardClient({
                 </form>
               </div>
 
-              {/* In-progress Queue */}
+              {/* In-progress Queue (Empty state cute vector cat) */}
               <div className="lg:col-span-5 flex flex-col gap-4">
                 <h3 className="text-xs font-bold text-slate-650 uppercase tracking-wide px-1">
                   Active Task Queue ({activeTasks.length})
@@ -539,32 +578,41 @@ export default function DashboardClient({
 
                 <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
                   {activeTasks.length === 0 ? (
-                    <div className="p-8 text-center rounded-2xl border border-dashed border-blue-250 text-slate-600 bg-white/35 backdrop-blur-sm text-sm font-bold">
-                      No active tasks. Create a focus block to get started!
+                    <div className="p-6 rounded-3xl border border-slate-100 bg-white text-center shadow-md flex flex-col items-center gap-3">
+                      <Image
+                        src="/cat_sleeping.png"
+                        alt="Cute grey cat sleeping curled up next to yarn"
+                        width={130}
+                        height={130}
+                        className="object-contain animate-pulse"
+                      />
+                      <p className="text-xs text-slate-500 font-bold leading-relaxed">
+                        Your queue is resting... Form a new focus block to get going!
+                      </p>
                     </div>
                   ) : (
                     activeTasks.map((t) => (
                       <div
                         key={t.id}
-                        className="p-4 rounded-xl border border-blue-100 bg-white/50 hover:border-blue-200 transition-all flex items-center justify-between gap-4 group shadow-sm hover:shadow"
+                        className="p-4 rounded-2xl border border-slate-100 bg-white hover:border-[#f2a893]/50 transition-all flex items-center justify-between gap-4 group shadow-sm hover:shadow"
                       >
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-slate-800 text-sm truncate">{t.title}</p>
-                          <p className="text-xs text-slate-600 font-bold mt-1">
+                          <p className="text-xs text-slate-500 font-bold mt-1">
                             Target: {t.allocatedTime || "∞"} mins
                           </p>
                         </div>
                         <div className="flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => startFocus(t)}
-                            className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                            className="p-2 rounded-lg bg-orange-50 text-[#e07f67] hover:bg-[#e07f67] hover:text-white transition-all shadow-sm border border-orange-100"
                             title="Start Focus"
                           >
                             <Play className="w-4 h-4 fill-current" />
                           </button>
                           <button
                             onClick={() => handleDeleteTask(t.id)}
-                            className="p-2 rounded-lg bg-white text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all shadow-sm border border-slate-200"
+                            className="p-2 rounded-lg bg-white text-slate-500 hover:bg-rose-50 hover:text-rose-650 transition-all shadow-sm border border-slate-200"
                             title="Delete Task"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -579,18 +627,18 @@ export default function DashboardClient({
           )}
         </div>
 
-        {/* Sidebar History Drawer (Perfect alignment) */}
+        {/* Sidebar History Drawer (Cozy Card Design) */}
         <div
           className={`${
             isHistoryOpen
-              ? "w-80 border border-blue-200 bg-white/70 backdrop-blur-xl shadow-xl rounded-2xl p-6"
+              ? "w-80 border border-slate-100 bg-white shadow-xl rounded-3xl p-6"
               : "w-0 overflow-hidden"
           } transition-all duration-300 shrink-0 flex flex-col relative`}
         >
           {/* Toggle Button */}
           <button
             onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-            className="absolute top-12 -left-3.5 p-1.5 rounded-full border border-blue-250 bg-white hover:bg-slate-50 text-slate-600 transition-all z-10 shadow-md"
+            className="absolute top-12 -left-3.5 p-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-650 transition-all z-10 shadow-md"
             title={isHistoryOpen ? "Close Task History" : "Open Task History"}
           >
             {isHistoryOpen ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -598,12 +646,12 @@ export default function DashboardClient({
 
           {isHistoryOpen && (
             <div className="flex flex-col h-full overflow-hidden">
-              <div className="flex items-center justify-between pb-4 border-b border-blue-200 shrink-0">
-                <h3 className="font-extrabold text-blue-900 text-sm tracking-tight flex items-center gap-2">
-                  <RotateCcw className="w-4 h-4 text-blue-600" />
+              <div className="flex items-center justify-between pb-4 border-b border-slate-200 shrink-0">
+                <h3 className="font-extrabold text-slate-800 text-sm tracking-tight flex items-center gap-2">
+                  <RotateCcw className="w-4 h-4 text-[#e07f67]" />
                   Task History
                 </h3>
-                <span className="text-xs bg-blue-50 text-blue-800 font-bold px-2 py-0.5 rounded-full border border-blue-200">
+                <span className="text-xs bg-orange-50 text-[#e07f67] font-bold px-2 py-0.5 rounded-full border border-[#f5c6bb]">
                   {completedTasks.length} Done
                 </span>
               </div>
@@ -611,17 +659,17 @@ export default function DashboardClient({
               {/* Completed list */}
               <div className="flex-1 overflow-y-auto py-4 space-y-3 pr-1">
                 {completedTasks.length === 0 ? (
-                  <div className="text-center py-12 text-slate-500 text-sm font-semibold">
-                    No completed focus logs.
+                  <div className="text-center py-12 text-slate-450 text-xs font-semibold">
+                    No completed focus logs yet.
                   </div>
                 ) : (
                   completedTasks.map((t) => (
                     <div
                       key={t.id}
-                      className="p-4 rounded-xl border border-blue-100 bg-white/50 hover:border-blue-200 transition-all flex items-start justify-between gap-3 group shadow-sm"
+                      className="p-4 rounded-2xl border border-slate-100 bg-white hover:border-[#f2a893]/35 transition-all flex items-start justify-between gap-3 group shadow-sm"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-slate-700 text-sm line-through decoration-slate-400 truncate">
+                        <p className="font-bold text-slate-600 text-sm line-through decoration-slate-350 truncate">
                           {t.title}
                         </p>
                         <div className="flex items-center gap-3 mt-1.5 text-xs font-bold text-slate-500">
@@ -630,12 +678,12 @@ export default function DashboardClient({
                             Done
                           </span>
                           <span>•</span>
-                          <span>Spent: {t.spentTime}m</span>
+                          <span>Logged: {t.spentTime}m</span>
                         </div>
                       </div>
                       <button
                         onClick={() => handleDeleteTask(t.id)}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"
                         title="Delete permanently"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -652,16 +700,16 @@ export default function DashboardClient({
       <div className="md:hidden border-t border-blue-200 bg-white p-4 text-center shrink-0">
         <Link
           href="/global-stats"
-          className="inline-flex items-center gap-2 text-sm text-blue-700 font-bold"
+          className="inline-flex items-center gap-2 text-sm text-[#e07f67] font-bold"
         >
-          <BarChart3 className="w-4 h-4 text-blue-600" />
+          <BarChart3 className="w-4 h-4" />
           View Global Stats
         </Link>
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-blue-200 py-4 text-center text-xs text-slate-500 shrink-0 bg-white/20">
-        <p>© {new Date().getFullYear()} FocusFlow. Productivity Dashboard.</p>
+      <footer className="border-t border-[#c6cfed] py-4 text-center text-xs text-slate-500 shrink-0 bg-white/20">
+        <p>© {new Date().getFullYear()} FocusFlow. Productivity Study Corner.</p>
       </footer>
     </div>
   );
