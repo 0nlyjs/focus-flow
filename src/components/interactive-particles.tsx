@@ -25,9 +25,9 @@ export default function InteractiveParticles() {
 
     // Colors matching the FocusFlow aesthetic: soft coral, blue-indigo, peach, and lavender
     const colors = [
-      "rgba(224, 127, 103, 0.28)", // #e07f67
+      "rgba(177, 155, 149, 0.28)", // #B19B95
       "rgba(79, 100, 162, 0.28)",  // #4f64a2
-      "rgba(242, 168, 147, 0.28)", // #f2a893
+      "rgba(203, 188, 185, 0.28)", // #CBBCB9
       "rgba(198, 207, 237, 0.35)"   // lavender glow
     ];
 

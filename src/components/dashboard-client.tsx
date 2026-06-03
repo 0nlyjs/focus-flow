@@ -356,7 +356,7 @@ export default function DashboardClient({
                 href="/global-stats"
                 className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/50 transition-colors font-bold"
               >
-                <BarChart3 className="w-4 h-4 text-[#e07f67]" />
+                <BarChart3 className="w-4 h-4 text-[#B19B95]" />
                 Global Stats
               </Link>
             </nav>
@@ -364,7 +364,7 @@ export default function DashboardClient({
 
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex flex-col text-right">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#e07f67]">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#B19B95]">
                 {isGuest ? "Sandbox Mode" : "Registered Member"}
               </span>
               <span className="text-sm font-bold text-slate-700 truncate max-w-[200px]">
@@ -375,7 +375,7 @@ export default function DashboardClient({
               onClick={handleSignOut}
               className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm text-slate-700 font-extrabold transition-all shadow-sm"
             >
-              <LogOut className="w-4 h-4 text-[#e07f67]" />
+              <LogOut className="w-4 h-4 text-[#B19B95]" />
               <span>Leave Session</span>
             </button>
           </div>
@@ -395,7 +395,7 @@ export default function DashboardClient({
               <div className="z-10 flex flex-col items-center gap-5 text-center max-w-lg">
                 
                 {/* Handwritten Cozy Encouragement Text */}
-                <div className="font-caveat text-4xl text-[#e07f67] animate-pulse py-1">
+                <div className="font-caveat text-4xl text-[#B19B95] animate-pulse py-1">
                   {currentQuote}
                 </div>
 
@@ -418,7 +418,7 @@ export default function DashboardClient({
                       cx="120"
                       cy="120"
                       r="102"
-                      className="stroke-[#e07f67] fill-none transition-all duration-1000 ease-linear"
+                      className="stroke-[#B19B95] fill-none transition-all duration-1000 ease-linear"
                       strokeWidth="6"
                       strokeDasharray="640"
                       strokeDashoffset={timeMode === "countdown" ? 640 - (640 * progressPercent) / 100 : strokeDashoffset}
@@ -459,7 +459,7 @@ export default function DashboardClient({
                     {timerState === "running" ? (
                       <button
                         onClick={() => setTimerState("paused")}
-                        className="p-2.5 rounded-full bg-[#f2a893] text-white hover:bg-[#e07f67] shadow-sm transition-all"
+                        className="p-2.5 rounded-full bg-[#CBBCB9] text-white hover:bg-[#B19B95] shadow-sm transition-all"
                         title="Pause Timer"
                       >
                         <Pause className="w-5 h-5 fill-current" />
@@ -467,7 +467,7 @@ export default function DashboardClient({
                     ) : (
                       <button
                         onClick={() => setTimerState("running")}
-                        className="p-2.5 rounded-full bg-[#e07f67] text-white hover:bg-[#d6725b] shadow-sm transition-all animate-bounce"
+                        className="p-2.5 rounded-full bg-[#B19B95] text-white hover:bg-[#A88F89] shadow-sm transition-all animate-bounce"
                         title="Resume Timer"
                       >
                         <Play className="w-5 h-5 fill-current" />
@@ -487,7 +487,7 @@ export default function DashboardClient({
                 {/* Main Action Button */}
                 <button
                   onClick={handleFinishActive}
-                  className="mt-2 w-full flex items-center justify-center gap-2 bg-[#e07f67] hover:bg-[#d6725b] text-white font-extrabold py-3 px-6 rounded-2xl shadow-lg transition-all"
+                  className="mt-2 w-full flex items-center justify-center gap-2 bg-[#B19B95] hover:bg-[#A88F89] text-white font-extrabold py-3 px-6 rounded-2xl shadow-lg transition-all"
                 >
                   <CheckCircle2 className="w-5 h-5" />
                   Finish Focus Block
@@ -499,7 +499,7 @@ export default function DashboardClient({
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Form Card */}
               <div className="lg:col-span-7 p-6 sm:p-8 rounded-3xl border border-slate-100 bg-white shadow-xl flex flex-col gap-6">
-                <div className="flex items-center gap-2 text-[#e07f67]">
+                <div className="flex items-center gap-2 text-[#B19B95]">
                   <Sparkles className="w-5 h-5" />
                   <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">Create Focus Block</h2>
                 </div>
@@ -521,7 +521,7 @@ export default function DashboardClient({
                       id="title"
                       required
                       placeholder="e.g. Designing mockup, Writing docs..."
-                      className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#f2a893]/30 focus:border-[#f2a893] transition-all text-sm font-bold shadow-sm"
+                      className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#CBBCB9]/30 focus:border-[#CBBCB9] transition-all text-sm font-bold shadow-sm"
                     />
                   </div>
 
@@ -535,7 +535,7 @@ export default function DashboardClient({
                           id="timeMode"
                           value={timeMode}
                           onChange={(e) => setTimeMode(e.target.value as "countdown" | "countup")}
-                          className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#f2a893]/30 focus:border-[#f2a893] transition-all text-sm font-bold appearance-none cursor-pointer shadow-sm"
+                          className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#CBBCB9]/30 focus:border-[#CBBCB9] transition-all text-sm font-bold appearance-none cursor-pointer shadow-sm"
                         >
                           <option value="countdown">Countdown Mode</option>
                           <option value="countup">Count Up Mode</option>
@@ -557,7 +557,7 @@ export default function DashboardClient({
                         max="180"
                         defaultValue="25"
                         disabled={timeMode === "countup"}
-                        className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#f2a893]/30 focus:border-[#f2a893] transition-all text-sm font-bold shadow-sm"
+                        className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#CBBCB9]/30 focus:border-[#CBBCB9] transition-all text-sm font-bold shadow-sm"
                       />
                     </div>
                   </div>
@@ -565,7 +565,7 @@ export default function DashboardClient({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#e07f67] to-[#f2a893] hover:from-[#d6725b] hover:to-[#e59580] text-white font-extrabold py-3 px-4 rounded-2xl shadow-lg transition-all disabled:opacity-70 group text-sm uppercase tracking-wider"
+                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#B19B95] to-[#CBBCB9] hover:from-[#A88F89] hover:to-[#BEABA7] text-white font-extrabold py-3 px-4 rounded-2xl shadow-lg transition-all disabled:opacity-70 group text-sm uppercase tracking-wider"
                   >
                     {isSubmitting ? "Creating..." : "Start Focus Session"}
                     <Play className="w-4 h-4 fill-white transition-transform group-hover:scale-105" />
@@ -597,7 +597,7 @@ export default function DashboardClient({
                     activeTasks.map((t) => (
                       <div
                         key={t.id}
-                        className="p-4 rounded-2xl border border-slate-100 bg-white hover:border-[#f2a893]/50 transition-all flex items-center justify-between gap-4 group shadow-sm hover:shadow"
+                        className="p-4 rounded-2xl border border-slate-100 bg-white hover:border-[#CBBCB9]/50 transition-all flex items-center justify-between gap-4 group shadow-sm hover:shadow"
                       >
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-slate-800 text-sm truncate">{t.title}</p>
@@ -608,7 +608,7 @@ export default function DashboardClient({
                         <div className="flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => startFocus(t)}
-                            className="p-2 rounded-lg bg-orange-50 text-[#e07f67] hover:bg-[#e07f67] hover:text-white transition-all shadow-sm border border-orange-100"
+                            className="p-2 rounded-lg bg-orange-50/50 text-[#B19B95] hover:bg-[#B19B95] hover:text-white transition-all shadow-sm border border-orange-100"
                             title="Start Focus"
                           >
                             <Play className="w-4 h-4 fill-current" />
@@ -651,10 +651,10 @@ export default function DashboardClient({
             <div className="flex flex-col h-full overflow-hidden">
               <div className="flex items-center justify-between pb-4 border-b border-slate-200 shrink-0">
                 <h3 className="font-extrabold text-slate-800 text-sm tracking-tight flex items-center gap-2">
-                  <RotateCcw className="w-4 h-4 text-[#e07f67]" />
+                  <RotateCcw className="w-4 h-4 text-[#B19B95]" />
                   Task History
                 </h3>
-                <span className="text-xs bg-orange-50 text-[#e07f67] font-bold px-2 py-0.5 rounded-full border border-[#f5c6bb]">
+                <span className="text-xs bg-orange-50/50 text-[#B19B95] font-bold px-2 py-0.5 rounded-full border border-[#E6D0CB]">
                   {completedTasks.length} Done
                 </span>
               </div>
@@ -669,7 +669,7 @@ export default function DashboardClient({
                   completedTasks.map((t) => (
                     <div
                       key={t.id}
-                      className="p-4 rounded-2xl border border-slate-100 bg-white hover:border-[#f2a893]/35 transition-all flex items-start justify-between gap-3 group shadow-sm"
+                      className="p-4 rounded-2xl border border-slate-100 bg-white hover:border-[#CBBCB9]/35 transition-all flex items-start justify-between gap-3 group shadow-sm"
                     >
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-slate-600 text-sm line-through decoration-slate-350 truncate">
@@ -703,7 +703,7 @@ export default function DashboardClient({
       <div className="md:hidden border-t border-blue-200 bg-white p-4 text-center shrink-0">
         <Link
           href="/global-stats"
-          className="inline-flex items-center gap-2 text-sm text-[#e07f67] font-bold"
+          className="inline-flex items-center gap-2 text-sm text-[#B19B95] font-bold"
         >
           <BarChart3 className="w-4 h-4" />
           View Global Stats
