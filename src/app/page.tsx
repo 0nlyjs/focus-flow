@@ -21,6 +21,7 @@ import {
   Volume2
 } from "lucide-react";
 import { handleLogin, handleGuestLogin } from "@/app/actions/auth-actions";
+import InteractiveParticles from "@/components/interactive-particles";
 
 export default function Home() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -43,9 +44,10 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] text-slate-800 font-sans selection:bg-[#f2a893] selection:text-white relative">
+    <div className="min-h-screen bg-[#D5DEFF] text-slate-800 font-sans selection:bg-[#f2a893] selection:text-white relative">
+      <InteractiveParticles />
       {/* Header / Navbar */}
-      <header className="border-b border-slate-100 bg-white/70 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-[#e07f67]/20 bg-[#e07f67]/10 backdrop-blur-lg sticky top-0 z-40 shadow-sm">
         <div className="mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">
           <Link href="/" className="text-xl font-black tracking-tight text-slate-850 hover:opacity-90 transition-opacity">
             FocusFlow
