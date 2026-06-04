@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 const CreateTaskSchema = z.object({
-  title: z.string().min(1, "Task description cannot be empty"),
+  title: z.string().trim().min(1, "Task description cannot be empty").max(280, "Task description cannot exceed 280 characters"),
   allocatedTime: z.number().int().min(1, "Allocated time must be at least 1 minute"),
 });
 
@@ -117,7 +117,6 @@ export async function syncGuestTasks(
       guestTasks.map((t) =>
         prisma.task.create({
           data: {
-            id: t.id,
             title: t.title,
             allocatedTime: t.allocatedTime,
             spentTime: t.spentTime,
