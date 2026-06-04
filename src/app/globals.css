@@ -5,6 +5,13 @@
   --foreground: #3E2361;
 }
 
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  background-color: #FAF6E3;
+}
+
 html {
   font-size: 95% !important;
 }
@@ -32,6 +39,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sintony), sans-serif;
+  overflow-x: hidden;
 }
 
 @keyframes float {
@@ -73,4 +81,89 @@ body {
 .animate-navbar-wave {
   animation: navbar-wave 8s ease-in-out infinite;
 }
+
+/* Glassmorphism Styles matching the uploaded mockup */
+.glass-tray {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(123, 82, 171, 0.1) 100%) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1.5px solid rgba(123, 82, 171, 0.25) !important;
+  box-shadow: none !important;
+  border-radius: 1.5rem !important; /* Elegant modern square-ish corners */
+  transition: border-color 0.3s ease;
+}
+
+.glass-pill-white {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 100%) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.9) !important;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.75) !important;
+  border-right: 1.2px solid rgba(255, 255, 255, 0.3) !important;
+  border-bottom: 1.5px solid rgba(123, 82, 171, 0.15) !important;
+  box-shadow: 
+    0 8px 20px -6px rgba(123, 82, 171, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+  border-radius: 9999px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.glass-pill-white:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.35) 100%) !important;
+  box-shadow: 
+    0 12px 24px -4px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+}
+
+.glass-pill-white:focus-within,
+.glass-pill-white:focus {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%) !important;
+  border-top-color: rgba(255, 255, 255, 0.95) !important;
+  border-left-color: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 
+    0 12px 28px -4px rgba(123, 82, 171, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  outline: none !important;
+}
+
+.glass-pill-orange {
+  background: linear-gradient(135deg, rgba(254, 215, 170, 0.72) 0%, rgba(251, 146, 60, 0.45) 100%) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.9) !important;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.65) !important;
+  border-right: 1px solid rgba(251, 146, 60, 0.2) !important;
+  border-bottom: 1.5px solid rgba(194, 65, 12, 0.25) !important;
+  box-shadow: 
+    0 16px 40px -4px rgba(249, 115, 22, 0.15),
+    0 6px 20px -2px rgba(249, 115, 22, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+  border-radius: 9999px !important;
+  color: #3e2361 !important; /* Rich brand purple contrast */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  text-shadow: 0 0.5px 1px rgba(255, 255, 255, 0.5);
+}
+
+.glass-pill-orange:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(254, 215, 170, 0.85) 0%, rgba(251, 146, 60, 0.58) 100%) !important;
+  box-shadow: 
+    0 20px 48px -4px rgba(249, 115, 22, 0.20),
+    0 8px 24px -2px rgba(249, 115, 22, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+  transform: translateY(-1px) scale(1.015);
+}
+
+.glass-pill-orange:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 
+    0 6px 16px -4px rgba(249, 115, 22, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Glass-style Option inputs */
+select.glass-pill-white option {
+  background: #FAF6E3;
+  color: #3e2361;
+}
+
 

@@ -95,7 +95,7 @@ export default function GlobalStatsClient({
       onDeleteTask={handleDeleteTask}
     >
       {/* Main Workspace Column */}
-      <div className="flex-1 flex flex-col gap-8 overflow-y-auto pr-1 transition-all duration-300">
+      <div className="flex-1 flex flex-col gap-8 pr-1 transition-all duration-300 overflow-y-auto">
         
         {/* Main Banner Heading */}
         <div className="flex flex-col gap-2 text-left">
