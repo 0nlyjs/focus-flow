@@ -52,23 +52,23 @@ export default function Home() {
     <div className="min-h-screen bg-[#FAF6E3] text-slate-800 font-sans selection:bg-[#7B52AB]/20 selection:text-[#3E2361] relative">
       <InteractiveParticles />
       {/* Header / Navbar */}
-      <header className="border-b border-[#B88D15]/20 bg-[#B88D15]/10 backdrop-blur-lg sticky top-0 z-40 shadow-sm">
+      <header className="bg-[#8869AA]/85 backdrop-blur-lg sticky top-0 z-40 shadow-sm animate-navbar-wave relative">
         <div className="mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">
           <Link
             href="/"
-            className="font-sans font-semibold text-2xl tracking-tight text-[#7B52AB]/80 hover:text-[#7B52AB] transition-colors inline-flex items-center leading-none"
+            className="font-sans font-semibold text-2xl tracking-tight text-[#F7F1D9]/90 hover:text-[#F7F1D9] transition-colors inline-flex items-center leading-none"
           >
             FocusFlow
           </Link>
           
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors">
+            <a href="#features" className="text-sm font-bold text-[#F7F1D9]/80 hover:text-[#F7F1D9] transition-colors">
               Features
             </a>
-            <a href="#methodology" className="text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors">
+            <a href="#methodology" className="text-sm font-bold text-[#F7F1D9]/80 hover:text-[#F7F1D9] transition-colors">
               Methodology
             </a>
-            <a href="#pricing" className="text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors">
+            <a href="#pricing" className="text-sm font-bold text-[#F7F1D9]/80 hover:text-[#F7F1D9] transition-colors">
               Pricing
             </a>
           </nav>
@@ -76,18 +76,20 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsLoginOpen(true)}
-              className="text-sm font-extrabold text-slate-550 hover:text-slate-900 transition-colors px-3 py-2"
+              className="text-sm font-extrabold text-[#F7F1D9]/80 hover:text-[#F7F1D9] transition-colors px-3 py-2"
             >
               Login
             </button>
             <button
               onClick={() => setIsLoginOpen(true)}
-              className="bg-[#7B52AB]/78 hover:bg-[#7B52AB]/90 border border-[#7B52AB]/40 text-white font-extrabold px-5 py-2 rounded-full text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all backdrop-blur-md"
+              className="bg-[#F7F1D9] hover:bg-[#F7F1D9]/90 text-[#3E2361] font-extrabold px-5 py-2 rounded-full text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all backdrop-blur-md"
             >
               Get Started
             </button>
           </div>
         </div>
+        {/* Purple stripebar */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#5C4578]" />
       </header>
 
       {/* Hero Section */}

@@ -43,8 +43,8 @@ export default function InteractiveParticles() {
 
     const initParticles = () => {
       particles = [];
-      // Dynamic particle count depending on viewport area
-      const numberOfParticles = Math.min(80, Math.floor((canvas.width * canvas.height) / 22000));
+      // Dynamic particle count depending on viewport area (increased by 10%)
+      const numberOfParticles = Math.min(88, Math.floor(((canvas.width * canvas.height) / 22000) * 1.1));
       for (let i = 0; i < numberOfParticles; i++) {
         const radius = Math.random() * 4.5 + 2;
         const x = Math.random() * canvas.width;
