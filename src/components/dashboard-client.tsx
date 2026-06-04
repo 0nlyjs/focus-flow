@@ -21,7 +21,7 @@ import {
   Music,
   Trophy,
 } from "lucide-react";
-import { createTask, logTaskChunk } from "@/app/actions/task-actions";
+import { createTask, logTaskInterval } from "@/app/actions/task-actions";
 import { useSearchParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/components/dashboard-layout";
 
@@ -78,7 +78,7 @@ export default function DashboardClient({
   const [secondsRemaining, setSecondsRemaining] = useState(0);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
 
-  const [showLogChunkConfirm, setShowLogChunkConfirm] = useState(false);
+  const [showLogIntervalConfirm, setShowLogIntervalConfirm] = useState(false);
   const [showFinishSuccess, setShowFinishSuccess] = useState(false);
   const [loggedMinutes, setLoggedMinutes] = useState(0);
 
@@ -292,27 +292,27 @@ export default function DashboardClient({
   };
 
   const handleLogProgressActive = () => {
-    setShowLogChunkConfirm(true);
+    setShowLogIntervalConfirm(true);
   };
 
   const confirmLogProgressActive = async () => {
-    setShowLogChunkConfirm(false);
+    setShowLogIntervalConfirm(false);
     if (!activeTask) return;
     const finalSpent = Math.max(1, Math.round(secondsElapsed / 60));
 
-    const chunkTitle = `${activeTask.title} [chunk:${activeTask.id}]`;
+    const intervalTitle = `${activeTask.title} [interval:${activeTask.id}]`;
 
     if (isGuest) {
-      const guestChunk: Task = {
+      const guestInterval: Task = {
         id: crypto.randomUUID(),
-        title: chunkTitle,
+        title: intervalTitle,
         allocatedTime: activeTask.allocatedTime,
         spentTime: finalSpent,
         isCompleted: true,
         createdAt: new Date().toISOString(),
       };
 
-      const updated = [guestChunk, ...tasks];
+      const updated = [guestInterval, ...tasks];
       saveGuestTasks(updated);
 
       // Reset timer state and exit UI
@@ -325,7 +325,7 @@ export default function DashboardClient({
     }
 
     try {
-      const res = await logTaskChunk(activeTask.id, chunkTitle, finalSpent, activeTask.allocatedTime);
+      const res = await logTaskInterval(activeTask.id, intervalTitle, finalSpent, activeTask.allocatedTime);
       if (res.error) {
         throw new Error(res.error);
       }
@@ -517,7 +517,7 @@ export default function DashboardClient({
                   title="Log progress but keep this task active"
                 >
                   <History className="w-3.5 h-3.5 text-[#B88D15]" />
-                  Log Chunk
+                  Log Interval
                 </button>
                 <button
                   onClick={handleFinishActive}
@@ -615,8 +615,8 @@ export default function DashboardClient({
         )}
       </div>
 
-      {/* Log Chunk Confirmation Modal */}
-      {showLogChunkConfirm && (
+      {/* Log Interval Confirmation Modal */}
+      {showLogIntervalConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#3E2361]/25 backdrop-blur-md animate-backdrop-fade">
           <div className="w-[min(420px,100%)] p-8 glass-tray flex flex-col items-center text-center gap-6 animate-modal-scale-up relative">
             <div className="p-4 rounded-full bg-white/20 border border-white/45 shadow-inner backdrop-blur-md text-[#7B52AB] shrink-0">
@@ -625,7 +625,7 @@ export default function DashboardClient({
             
             <div className="flex flex-col gap-2">
               <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">
-                Log Focus Chunk?
+                Log Focus Interval?
               </h3>
               <p className="text-xs text-slate-600 font-bold leading-relaxed max-w-sm">
                 This will save your current focus session of <strong className="text-[#7B52AB]">{Math.max(1, Math.round(secondsElapsed / 60))} {Math.max(1, Math.round(secondsElapsed / 60)) === 1 ? 'minute' : 'minutes'}</strong> to history, but keep this task open so you can continue it later.
@@ -634,7 +634,7 @@ export default function DashboardClient({
 
             <div className="flex flex-col sm:flex-row gap-3 w-full mt-2">
               <button
-                onClick={() => setShowLogChunkConfirm(false)}
+                onClick={() => setShowLogIntervalConfirm(false)}
                 className="flex-1 flex items-center justify-center glass-pill-white font-extrabold py-3.5 px-4 text-[10px] uppercase tracking-wider cursor-pointer"
               >
                 Cancel
@@ -643,7 +643,7 @@ export default function DashboardClient({
                 onClick={confirmLogProgressActive}
                 className="flex-1 flex items-center justify-center glass-pill-orange font-extrabold py-3.5 px-4 text-[10px] uppercase tracking-wider cursor-pointer"
               >
-                Yes, Log Chunk
+                Yes, Log Interval
               </button>
             </div>
           </div>

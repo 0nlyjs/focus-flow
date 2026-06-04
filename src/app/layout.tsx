@@ -35,8 +35,8 @@ export default function RootLayout({
         <InteractiveParticles />
         {/* Persistent background glows wrapped to prevent overflow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="lp-glow-1 absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-[#EADBF7]/40 blur-[120px] transition-all duration-400" />
-          <div className="lp-glow-2 absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-[#FAF6E3]/40 blur-[120px] transition-all duration-400" />
+          <div className="lp-glow-1 absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full blur-[120px] transition-all duration-400" />
+          <div className="lp-glow-2 absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full blur-[120px] transition-all duration-400" />
         </div>
 
         {/* Root content wrapper */}

@@ -87,11 +87,11 @@ export default function GlobalStatsClient({
     }
   };
 
-  // Group tasks by original task identity to calculate chunk statistics
+  // Group tasks by original task identity to calculate interval statistics
   const taskGroups: { [key: string]: Task[] } = {};
   tasks.forEach((t) => {
-    const match = t.title.match(/\[chunk:([^\]]+)\]$/);
-    const parentId = match ? match[1] : t.id;
+    const match = t.title.match(/\[(chunk|interval):([^\]]+)\]$/);
+    const parentId = match ? match[2] : t.id;
     if (!taskGroups[parentId]) {
       taskGroups[parentId] = [];
     }
@@ -99,48 +99,48 @@ export default function GlobalStatsClient({
   });
 
   let finishedInOneGo = 0;
-  let finishedInChunks = 0;
-  let activeChunkedTasks = 0;
-  let totalChunksLogged = 0;
-  let maxChunksInATask = 0;
-  let maxChunksTaskTitle = "";
+  let finishedInIntervals = 0;
+  let activeIntervalTasks = 0;
+  let totalIntervalsLogged = 0;
+  let maxIntervalsInATask = 0;
+  let maxIntervalsTaskTitle = "";
 
   Object.entries(taskGroups).forEach(([parentId, groupTasks]) => {
     const parent = groupTasks.find((t) => t.id === parentId);
-    const chunks = groupTasks.filter((t) => t.id !== parentId);
+    const intervals = groupTasks.filter((t) => t.id !== parentId);
 
-    totalChunksLogged += chunks.length;
+    totalIntervalsLogged += intervals.length;
 
     if (parent) {
       if (parent.isCompleted) {
-        if (chunks.length > 0) {
-          finishedInChunks++;
-          if (chunks.length > maxChunksInATask) {
-            maxChunksInATask = chunks.length;
-            maxChunksTaskTitle = parent.title;
+        if (intervals.length > 0) {
+          finishedInIntervals++;
+          if (intervals.length > maxIntervalsInATask) {
+            maxIntervalsInATask = intervals.length;
+            maxIntervalsTaskTitle = parent.title;
           }
         } else {
           finishedInOneGo++;
         }
       } else {
-        if (chunks.length > 0) {
-          activeChunkedTasks++;
+        if (intervals.length > 0) {
+          activeIntervalTasks++;
         }
       }
     } else {
-      // If the parent task was deleted, but chunks exist
-      if (chunks.length > 0) {
-        finishedInChunks++;
-        const cleanTitle = chunks[0].title.replace(/\s\[chunk:[^\]]+\]$/, "");
-        if (chunks.length > maxChunksInATask) {
-          maxChunksInATask = chunks.length;
-          maxChunksTaskTitle = cleanTitle;
+      // If the parent task was deleted, but intervals exist
+      if (intervals.length > 0) {
+        finishedInIntervals++;
+        const cleanTitle = intervals[0].title.replace(/\s\[(chunk|interval):[^\]]+\]$/, "");
+        if (intervals.length > maxIntervalsInATask) {
+          maxIntervalsInATask = intervals.length;
+          maxIntervalsTaskTitle = cleanTitle;
         }
       }
     }
   });
 
-  const cleanMaxTitle = maxChunksTaskTitle.replace(/\s\[chunk:[^\]]+\]$/, "");
+  const cleanMaxTitle = maxIntervalsTaskTitle.replace(/\s\[(chunk|interval):[^\]]+\]$/, "");
 
   return (
     <DashboardLayout
@@ -214,7 +214,7 @@ export default function GlobalStatsClient({
           </div>
 
           <p className="text-xs text-slate-500 font-bold -mt-3">
-            Analyze whether you complete tasks in a single continuous session or build progress incrementally over multiple logged chunks.
+            Analyze whether you complete tasks in a single continuous session or build progress incrementally over multiple logged intervals.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
@@ -225,36 +225,36 @@ export default function GlobalStatsClient({
               <span className="text-[10px] text-slate-400 font-bold mt-1">Finished in one go</span>
             </div>
 
-            {/* Stat: Chunks */}
+            {/* Stat: Intervals */}
             <div className="p-4 rounded-2xl bg-[#FAF6E3]/60 border border-[#7B52AB]/15 flex flex-col justify-center">
               <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Incremental Builds</span>
-              <span className="text-2xl font-black text-slate-900 mt-1">{finishedInChunks}</span>
-              <span className="text-[10px] text-slate-400 font-bold mt-1">Finished in chunks</span>
+              <span className="text-2xl font-black text-slate-900 mt-1">{finishedInIntervals}</span>
+              <span className="text-[10px] text-slate-400 font-bold mt-1">Finished in intervals</span>
             </div>
 
-            {/* Stat: Active Chunks */}
+            {/* Stat: Active Intervals */}
             <div className="p-4 rounded-2xl bg-[#FAF6E3]/60 border border-[#7B52AB]/15 flex flex-col justify-center">
               <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Active Progress Tasks</span>
-              <span className="text-2xl font-black text-slate-900 mt-1">{activeChunkedTasks}</span>
+              <span className="text-2xl font-black text-slate-900 mt-1">{activeIntervalTasks}</span>
               <span className="text-[10px] text-slate-400 font-bold mt-1">Still in progress</span>
             </div>
 
-            {/* Stat: Total Chunks */}
+            {/* Stat: Total Intervals */}
             <div className="p-4 rounded-2xl bg-[#FAF6E3]/60 border border-[#7B52AB]/15 flex flex-col justify-center">
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Chunks Logged</span>
-              <span className="text-2xl font-black text-slate-900 mt-1">{totalChunksLogged}</span>
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Intervals Logged</span>
+              <span className="text-2xl font-black text-slate-900 mt-1">{totalIntervalsLogged}</span>
               <span className="text-[10px] text-slate-400 font-bold mt-1">Accumulated sessions</span>
             </div>
           </div>
 
-          {maxChunksInATask > 0 && (
+          {maxIntervalsInATask > 0 && (
             <div className="p-4 rounded-2xl border border-dashed border-[#B88D15]/30 bg-[#B88D15]/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <span className="text-[10px] text-[#B88D15] font-extrabold uppercase tracking-wider block mb-1">Most Resilient Focus Milestone</span>
                 <p className="font-bold text-slate-800 text-sm truncate">{cleanMaxTitle}</p>
               </div>
               <div className="shrink-0 bg-[#B88D15]/15 text-[#B88D15] border border-[#B88D15]/30 font-extrabold px-3 py-1.5 rounded-xl text-xs uppercase tracking-wide">
-                Took {maxChunksInATask} chunks to resolve
+                Took {maxIntervalsInATask} intervals to resolve
               </div>
             </div>
           )}

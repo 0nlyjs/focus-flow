@@ -268,7 +268,7 @@ export default function DashboardLayout({
       </div>
 
       <div
-        className={`flex-1 flex overflow-hidden w-full px-4 sm:px-6 py-6 sm:py-8 gap-8 relative z-10 items-stretch transition-all duration-300
+        className={`flex-1 flex overflow-hidden w-full px-4 sm:px-6 py-6 sm:py-8 gap-8 relative z-20 items-stretch transition-all duration-300
           ${isSidebarOpen ? "lg:pl-80" : "lg:pl-0"}
           ${isHistoryOpen ? "lg:pr-80" : "lg:pr-0"}
         `}
@@ -319,26 +319,26 @@ export default function DashboardLayout({
                 </div>
               ) : (
                 completedTasks.map((t) => {
-                  const isChunk = /\[chunk:[^\]]+\]$/.test(t.title);
-                  const cleanTitle = t.title.replace(/\s\[chunk:[^\]]+\]$/, "");
+                  const isInterval = /\[(chunk|interval):[^\]]+\]$/.test(t.title);
+                  const cleanTitle = t.title.replace(/\s\[(chunk|interval):[^\]]+\]$/, "");
                   return (
                     <div
                       key={t.id}
                       className="p-4 rounded-2xl border border-[#B88D15]/20 bg-[#FAF6E3]/40 backdrop-blur-md hover:bg-[#FAF6E3]/60 hover:border-[#7B52AB]/35 transition-all flex items-start justify-between gap-3 group shadow-sm"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-slate-600 text-sm line-through decoration-slate-350 truncate flex items-center flex-wrap gap-1.5">
-                          <span className="truncate">{cleanTitle}</span>
-                          {isChunk && (
-                            <span className="text-[8px] bg-amber-100/70 text-[#B88D15] border border-[#B88D15]/30 font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0 leading-none">
-                              Chunk
+                        <p className="font-bold text-slate-600 text-sm flex items-center flex-wrap gap-1.5">
+                          <span>{cleanTitle}</span>
+                          {isInterval && (
+                            <span className="text-[8px] bg-amber-100/70 dark:bg-amber-500/20 text-[#B88D15] dark:text-[#D4A82A] border border-[#B88D15]/30 dark:border-amber-500/35 font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0 leading-none">
+                              Interval
                             </span>
                           )}
                         </p>
                         <div className="flex items-center gap-3 mt-1.5 text-xs font-bold text-slate-500">
                           <span className="flex items-center gap-1 text-emerald-600 font-extrabold">
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                            {isChunk ? "Logged" : "Done"}
+                            {isInterval ? "Logged" : "Done"}
                           </span>
                           <span>•</span>
                           <span>Logged: {t.spentTime}m</span>
@@ -363,7 +363,7 @@ export default function DashboardLayout({
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-[#B88D15]/20 py-4 text-center text-xs text-slate-500 shrink-0 bg-[#FAF6E3]/20 relative z-10">
+      <footer className="border-t border-[#B88D15]/20 py-4 text-center text-xs text-slate-500 shrink-0 bg-[#FAF6E3]/20 relative z-0">
         <p>© {new Date().getFullYear()} FocusFlow. Productivity Study Corner.</p>
       </footer>
     </div>

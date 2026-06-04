@@ -58,12 +58,21 @@ html {
   transition: color 0.4s ease;
 }
 
+/* ─── Landing Page Glows ────────────────────────────────────────── */
+.lp-glow-1 {
+  background-color: rgba(253, 251, 242, 0.95) !important; /* Same as #FAF6E3 but very slightly lighter to distinguish */
+}
+
+.lp-glow-2 {
+  background-color: rgba(250, 246, 227, 0.4) !important; /* Same color as right side (#FAF6E3) */
+}
+
 [data-theme="dark"] .lp-glow-1 {
   background-color: rgba(123, 82, 171, 0.22) !important;
 }
 
 [data-theme="dark"] .lp-glow-2 {
-  background-color: rgba(184, 141, 21, 0.15) !important;
+  background-color: rgba(123, 82, 171, 0.08) !important; /* Soft purple instead of gold/orange to blend seamlessly */
 }
 
 [data-theme="dark"] .lp-header {
@@ -348,12 +357,12 @@ body {
 }
 
 .glass-pill-orange {
-  background: linear-gradient(135deg, rgba(254, 215, 170, 0.72) 0%, rgba(251, 146, 60, 0.45) 100%) !important;
+  background: linear-gradient(135deg, rgba(251, 146, 60, 1) 0%, rgba(249, 115, 22, 0.96) 100%) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border-top: 1.5px solid rgba(255, 255, 255, 0.9) !important;
   border-left: 1.5px solid rgba(255, 255, 255, 0.65) !important;
-  border-right: 1px solid rgba(251, 146, 60, 0.2) !important;
+  border-right: 1px solid rgba(249, 115, 22, 0.2) !important;
   border-bottom: 1.5px solid rgba(194, 65, 12, 0.25) !important;
   box-shadow: 
     0 16px 40px -4px rgba(249, 115, 22, 0.15),
@@ -366,7 +375,7 @@ body {
 }
 
 .glass-pill-orange:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(254, 215, 170, 0.85) 0%, rgba(251, 146, 60, 0.58) 100%) !important;
+  background: linear-gradient(135deg, rgba(251, 146, 60, 1) 0%, rgba(249, 115, 22, 1) 100%) !important;
   box-shadow: 
     0 20px 48px -4px rgba(249, 115, 22, 0.20),
     0 8px 24px -2px rgba(249, 115, 22, 0.10),
@@ -473,6 +482,29 @@ select.glass-pill-white option {
 }
 [data-theme="dark"] .border-rose-300 {
   border-color: rgba(244, 63, 94, 0.3) !important;
+}
+
+[data-theme="dark"] .glass-pill-orange {
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.85) 0%, rgba(249, 115, 22, 0.72) 100%) !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+  border-right: 1px solid rgba(249, 115, 22, 0.3) !important;
+  border-bottom: 1.5px solid rgba(194, 65, 12, 0.4) !important;
+  box-shadow: 
+    0 12px 24px -4px rgba(249, 115, 22, 0.22),
+    0 4px 8px -2px rgba(249, 115, 22, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  color: #0F0A1A !important;
+  text-shadow: none !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="dark"] .glass-pill-orange:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.9) 0%, rgba(249, 115, 22, 0.8) 100%) !important;
+  box-shadow: 
+    0 16px 28px -4px rgba(249, 115, 22, 0.35),
+    0 6px 12px -2px rgba(249, 115, 22, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
 

@@ -55,7 +55,7 @@ export async function createTask(prevState: any, formData: FormData) {
   }
 }
 
-export async function logTaskChunk(
+export async function logTaskInterval(
   parentId: string,
   title: string,
   spentTime: number,
@@ -90,7 +90,7 @@ export async function logTaskChunk(
       },
     };
   } catch (error) {
-    console.error("Error logging task chunk:", error);
-    return { error: "Failed to log task chunk" };
+    console.error("Error logging task interval:", error);
+    return { error: "Failed to log task interval" };
   }
 }
