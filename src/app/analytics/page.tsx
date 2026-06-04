@@ -27,9 +27,10 @@ export default async function AnalyticsPage() {
     createdAt: string;
   }[] = [];
 
-  let userDetails: { name: string | null; email: string } = {
+  let userDetails: { name: string | null; email: string; image?: string | null } = {
     name: "Guest User",
     email: "guest@focusflow.local",
+    image: null,
   };
 
   // If authenticated, load tasks from DB
@@ -37,6 +38,7 @@ export default async function AnalyticsPage() {
     userDetails = {
       name: session.user.name || null,
       email: session.user.email || "",
+      image: session.user.image || null,
     };
 
     const tasks = await prisma.task.findMany({

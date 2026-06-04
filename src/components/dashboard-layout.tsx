@@ -17,10 +17,14 @@ import {
   LayoutDashboard,
   CheckCircle2,
   Sun,
-  Moon
+  Moon,
+  UserCog,
+  X,
+  AlertTriangle
 } from "lucide-react";
 
 import { syncGuestTasks } from "@/app/actions/task-actions";
+import { updateNameAction, deleteAccountAction, signOutAction } from "@/app/actions/auth-actions";
 
 interface Task {
   id: string;
@@ -35,6 +39,7 @@ interface DashboardLayoutProps {
   user: {
     name: string | null;
     email: string;
+    image?: string | null;
   };
   tasks: Task[];
   isGuest?: boolean;
@@ -58,6 +63,75 @@ export default function DashboardLayout({
   const [isDark, setIsDark] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Profile modal state
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [profileName, setProfileName] = useState(user.name || "");
+  const [isSavingName, setIsSavingName] = useState(false);
+  const [profileError, setProfileError] = useState("");
+  const [profileSuccess, setProfileSuccess] = useState("");
+
+  // Sync profileName state if user.name changes
+  useEffect(() => {
+    setProfileName(user.name || "");
+  }, [user.name]);
+
+  const handleUpdateName = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profileName.trim()) {
+      setProfileError("Name cannot be empty");
+      return;
+    }
+    setIsSavingName(true);
+    setProfileError("");
+    setProfileSuccess("");
+
+    try {
+      const res = await updateNameAction(profileName);
+      if (res?.error) {
+        setProfileError(res.error);
+      } else {
+        setProfileSuccess("Name updated successfully!");
+        router.refresh();
+      }
+    } catch (err: any) {
+      setProfileError("Failed to update name. Please try again.");
+    } finally {
+      setIsSavingName(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (isGuest) {
+      if (confirm("Are you sure you want to delete your guest session and clear all local tasks? This action cannot be undone.")) {
+        localStorage.removeItem("focusflow_guest_tasks");
+        document.cookie = "guest-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        window.location.href = "/";
+      }
+      return;
+    }
+
+    if (
+      confirm(
+        "WARNING: Are you sure you want to permanently delete your account? All your tasks, settings, and account details will be deleted forever. This action cannot be undone."
+      )
+    ) {
+      try {
+        const res = await deleteAccountAction();
+        if (res?.error) {
+          alert(res.error);
+        } else {
+          if (onSignOut) {
+            onSignOut();
+          } else {
+            window.location.href = "/";
+          }
+        }
+      } catch (err: any) {
+        alert("Failed to delete account. Please try again.");
+      }
+    }
+  };
 
   // Synchronize guest tasks to database if user is logged in
   useEffect(() => {
@@ -107,15 +181,18 @@ export default function DashboardLayout({
     router.push(`/dashboard?title=${encodeURIComponent(task.title)}&reminderId=${task.id}`);
   };
 
-  const handleLeaveSession = () => {
-    if (onSignOut) {
-      onSignOut();
+  const handleLeaveSession = async () => {
+    // 1. Clear cookies client-side immediately
+    document.cookie = "guest-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    document.cookie = "authjs.session-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    document.cookie = "__Secure-authjs.session-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; path=/;";
+    document.cookie = "next-auth.session-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
+    // 2. Redirect client-side for guests, or call Server Action to sign out for authenticated users
+    if (isGuest) {
+      window.location.href = "/";
     } else {
-      // Fallback
-      if (isGuest) {
-        document.cookie = "guest-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-        window.location.href = "/";
-      }
+      await signOutAction();
     }
   };
 
@@ -169,9 +246,6 @@ export default function DashboardLayout({
             </button>
 
             {/* Minimal indicator */}
-            <span className="hidden sm:inline text-xs font-extrabold uppercase tracking-wider text-[#B88D15]">
-              {isGuest ? "Sandbox Mode" : "Registered Member"}
-            </span>
           </div>
         </div>
         {/* Purple stripebar */}
@@ -276,23 +350,97 @@ export default function DashboardLayout({
             </div>
           </div>
 
-          {/* Sidebar Bottom: Profile & Leave Session */}
+          {/* Sidebar Bottom: Profile & Sign Out */}
           <div className="pt-4 border-t border-[#7B52AB]/20 shrink-0 flex flex-col gap-4 mt-auto">
-            <div className="flex flex-col px-1">
-              <span className="text-[9px] font-extrabold uppercase tracking-wider text-[#B88D15]">
-                {isGuest ? "Sandbox Profile" : "Registered Focuser"}
-              </span>
-              <span className="text-xs font-bold text-slate-700 truncate block mt-0.5" title={user.email}>
-                {user.email}
-              </span>
-            </div>
-            <button
-              onClick={handleLeaveSession}
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-[#7B52AB]/20 bg-[#FAF6E3]/40 backdrop-blur-md hover:bg-[#FAF6E3]/60 hover:border-[#7B52AB]/35 text-xs text-[#3E2361] font-extrabold transition-all shadow-sm cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5 text-[#B88D15]" />
-              <span>Leave Session</span>
-            </button>
+            {isGuest ? (
+              <div className="flex flex-col gap-3.5">
+                {/* Guest Alert Card */}
+                <div className="glass-tray border-amber-500/30 bg-amber-500/5 p-4 flex flex-col gap-2 shadow-sm">
+                  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-500">
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Unsaved Session</span>
+                  </div>
+                  <p className="text-[10px] font-bold leading-normal text-slate-600 dark:text-slate-400">
+                    You are playing as a Guest. Your logs are saved only locally. Sign in to back up your data.
+                  </p>
+                  <button
+                    onClick={() => window.location.href = "/?login=true"}
+                    className="mt-1 w-full flex items-center justify-center gap-1.5 glass-pill-orange text-[9px] font-extrabold uppercase tracking-wider py-2 px-3 cursor-pointer"
+                  >
+                    Sign In / Register
+                  </button>
+                </div>
+
+                {/* Leave Session Button */}
+                <button
+                  type="button"
+                  onClick={handleLeaveSession}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-[#7B52AB]/20 bg-[#FAF6E3]/40 backdrop-blur-md hover:bg-[#FAF6E3]/60 hover:border-[#7B52AB]/35 text-xs text-[#3E2361] font-extrabold transition-all shadow-sm cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5 text-[#B88D15]" />
+                  <span>Leave Guest Session</span>
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 px-1">
+                  {/* User Photo */}
+                  {user.image ? (
+                    <img
+                      src={user.image}
+                      alt={user.name || "User"}
+                      className="w-10 h-10 rounded-full border border-[#7B52AB]/20 object-cover shadow-sm shrink-0"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    /* Cute Smiley Person Avatar */
+                    <div className="w-10 h-10 rounded-full bg-[#7B52AB]/15 flex items-center justify-center border border-[#7B52AB]/25 shrink-0 shadow-inner">
+                      <svg className="w-6 h-6 text-[#7B52AB]/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 14s1.5 2.5 4 2.5 4-2.5 4-2.5" />
+                        <line x1="9" y1="9" x2="9.01" y2="9" />
+                        <line x1="15" y1="9" x2="15.01" y2="9" />
+                      </svg>
+                    </div>
+                  )}
+                  
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-black text-slate-800 truncate block leading-tight">
+                      {user.name ? user.name.split(" ")[0] : "User"}
+                    </span>
+                    <span className="text-[11px] font-bold text-slate-500 truncate block mt-0.5" title={user.email}>
+                      {user.email}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  {/* Profile Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileError("");
+                      setProfileSuccess("");
+                      setIsProfileOpen(true);
+                    }}
+                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-[#7B52AB]/20 bg-[#FAF6E3]/40 backdrop-blur-md hover:bg-[#FAF6E3]/60 hover:border-[#7B52AB]/35 text-xs text-[#3E2361] font-extrabold transition-all shadow-sm cursor-pointer"
+                  >
+                    <UserCog className="w-3.5 h-3.5 text-[#B88D15]" />
+                    <span>Profile Settings</span>
+                  </button>
+
+                  {/* Sign Out Button */}
+                  <button
+                    type="button"
+                    onClick={handleLeaveSession}
+                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-[#7B52AB]/20 bg-[#FAF6E3]/40 backdrop-blur-md hover:bg-[#FAF6E3]/60 hover:border-[#7B52AB]/35 text-xs text-[#3E2361] font-extrabold transition-all shadow-sm cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-[#B88D15]" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -396,6 +544,104 @@ export default function DashboardLayout({
       <footer className="border-t border-[#B88D15]/20 py-4 text-center text-xs text-slate-500 shrink-0 bg-[#FAF6E3]/20 relative z-0">
         <p>© {new Date().getFullYear()} FocusFlow. Productivity Study Corner.</p>
       </footer>
+
+      {/* Profile Modal Overlay */}
+      {isProfileOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0A0614]/85 backdrop-blur-md animate-login-backdrop">
+          <div className={`rounded-[2rem] border shadow-2xl max-w-md w-full relative p-8 animate-modal-scale-up backdrop-blur-md transition-all duration-300 ${isDark ? "bg-[#150D24]/95 border-[rgba(123,82,171,0.25)] text-[#EDE8F5]" : "bg-[#FFFDF5]/95 border-[#B88D15]/20 text-slate-900"}`}>
+            
+            {/* Close button */}
+            <button
+              onClick={() => setIsProfileOpen(false)}
+              className={`absolute top-5 right-5 p-2 rounded-full transition-all border cursor-pointer z-20 ${isDark ? "text-[#6B6080] border-transparent hover:text-[#A89FC0] hover:bg-[rgba(123,82,171,0.15)]" : "text-slate-400 border-transparent hover:text-slate-855 hover:bg-slate-100"}`}
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex flex-col gap-5">
+              <div className="text-center">
+                <h3 className="font-sans font-black text-2xl tracking-tight text-[#7B52AB]">Profile Settings</h3>
+                <p className={`text-xs mt-1.5 ${isDark ? "text-[#A89FC0]" : "text-slate-500"}`}>
+                  Update your display name or manage your account.
+                </p>
+              </div>
+
+              {profileError && (
+                <div className="p-3 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-red-600 dark:text-red-400 rounded-xl text-xs font-bold animate-pulse">
+                  {profileError}
+                </div>
+              )}
+
+              {profileSuccess && (
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold">
+                  {profileSuccess}
+                </div>
+              )}
+
+              <form onSubmit={handleUpdateName} className="space-y-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-1">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    disabled
+                    value={user.email}
+                    className={`w-full px-4 py-3 rounded-2xl border text-sm font-bold shadow-sm opacity-60 cursor-not-allowed ${
+                      isDark
+                        ? "bg-[rgba(123,82,171,0.08)] border-[rgba(123,82,171,0.25)] text-[#EDE8F5]/70"
+                        : "border-[#7B52AB]/20 bg-[#FAF6E3]/30 text-slate-500"
+                    }`}
+                  />
+                  <p className="text-[10px] text-slate-400 px-1 italic">Email address cannot be changed</p>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="profileName" className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-1">
+                    Display Name
+                  </label>
+                  <input
+                    type="text"
+                    id="profileName"
+                    required
+                    value={profileName}
+                    onChange={(e) => setProfileName(e.target.value)}
+                    placeholder="Enter your name"
+                    className={`w-full px-4 py-3 rounded-2xl border focus:outline-none focus:ring-2 focus:ring-[#7B52AB]/30 focus:border-[#7B52AB] transition-all text-sm font-bold shadow-sm ${
+                      isDark
+                        ? "bg-[rgba(123,82,171,0.08)] border-[rgba(123,82,171,0.25)] text-[#EDE8F5]"
+                        : "border-[#7B52AB]/20 bg-[#FAF6E3]/30 text-slate-900"
+                    }`}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSavingName}
+                  className="w-full flex items-center justify-center bg-[#7B52AB]/78 hover:bg-[#7B52AB]/90 border border-[#7B52AB]/40 text-white font-extrabold py-3 px-4 rounded-2xl transition-all text-xs uppercase tracking-wider shadow-md hover:shadow-lg disabled:opacity-75 cursor-pointer"
+                >
+                  {isSavingName ? "Saving..." : "Save Name Changes"}
+                </button>
+              </form>
+
+              {/* Danger Zone */}
+              <div className={`mt-2 border-t pt-4 flex flex-col gap-3 ${isDark ? "border-[rgba(123,82,171,0.18)]" : "border-slate-100"}`}>
+                <h4 className="text-[10px] font-black uppercase tracking-wider text-red-500 px-1">
+                  Danger Zone
+                </h4>
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  className="w-full flex items-center justify-center gap-2 border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 text-red-600 dark:text-red-400 font-extrabold py-3 px-4 rounded-2xl transition-all text-xs uppercase tracking-wider shadow-sm cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete My Account</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { signOutAction } from "@/app/actions/auth-actions";
 import Image from "next/image";
 import {
   Clock,
@@ -643,13 +643,13 @@ export default function DashboardClient({
     }
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    document.cookie = "guest-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    
     if (isGuest) {
-      document.cookie =
-        "guest-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
       window.location.href = "/";
     } else {
-      signOut({ callbackUrl: "/" });
+      await signOutAction();
     }
   };
 
@@ -956,11 +956,13 @@ export default function DashboardClient({
         )}
 
         {/* Calendar widget at bottom */}
-        <FocusHistoryCalendar
-          tasks={tasks}
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-        />
+        {!activeTask && (
+          <FocusHistoryCalendar
+            tasks={tasks}
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
+          />
+        )}
       </div>
 
       {/* Log Interval Confirmation Modal */}
