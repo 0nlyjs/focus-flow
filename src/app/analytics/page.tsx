@@ -2,11 +2,11 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import GlobalStatsClient from "@/components/global-stats-client";
+import AnalyticsClient from "@/components/analytics-client";
 
 export const dynamic = "force-dynamic";
 
-export default async function GlobalStatsPage() {
+export default async function AnalyticsPage() {
   const session = await auth();
   
   // Read cookies to check for guest session
@@ -80,7 +80,7 @@ export default async function GlobalStatsPage() {
   }
 
   return (
-    <GlobalStatsClient
+    <AnalyticsClient
       user={userDetails}
       initialTasks={formattedTasks}
       isGuest={isGuest}

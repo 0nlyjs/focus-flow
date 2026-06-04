@@ -192,9 +192,9 @@ export default function DashboardLayout({
                 <BellRing className="w-4 h-4 text-[#7B52AB]" />
                 My Reminders
               </Link>
-              <Link href="/global-stats" className={getLinkClasses("/global-stats")}>
+              <Link href="/analytics" className={getLinkClasses("/analytics")}>
                 <BarChart3 className="w-4 h-4 text-[#B88D15]" />
-                Global Stats
+                Analytics
               </Link>
             </nav>
 
