@@ -19,7 +19,6 @@ import {
   Volume2
 } from "lucide-react";
 import { handleLogin, handleGuestLogin } from "@/app/actions/auth-actions";
-import InteractiveParticles from "@/components/interactive-particles";
 
 export default function Home() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -49,8 +48,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF6E3] text-slate-800 font-sans selection:bg-[#7B52AB]/20 selection:text-[#3E2361] relative">
-      <InteractiveParticles />
+    <div className="min-h-screen relative">
       {/* Header / Navbar */}
       <header className="bg-[#8869AA]/85 backdrop-blur-lg sticky top-0 z-40 shadow-sm animate-navbar-wave relative">
         <div className="mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">

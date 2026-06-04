@@ -17,7 +17,6 @@ import {
   LayoutDashboard,
   CheckCircle2
 } from "lucide-react";
-import InteractiveParticles from "@/components/interactive-particles";
 
 interface Task {
   id: string;
@@ -85,11 +84,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="relative h-screen max-h-screen w-screen overflow-hidden bg-[#FAF6E3] text-slate-800 font-sans flex flex-col justify-between selection:bg-[#7B52AB]/20 selection:text-[#3E2361]">
-      <InteractiveParticles />
-      {/* Background glows */}
-      <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-[#EADBF7]/40 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-[#FAF6E3]/40 blur-[120px] pointer-events-none" />
+    <div className="relative h-screen max-h-screen w-screen overflow-hidden flex flex-col justify-between">
 
       {/* Header Top Bar */}
       <header className="bg-[#8869AA]/85 backdrop-blur-lg sticky top-0 z-40 shadow-sm animate-navbar-wave relative shrink-0">
