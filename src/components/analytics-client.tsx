@@ -189,7 +189,7 @@ export default function AnalyticsClient({
                 </p>
                 <button
                   onClick={() => window.location.href = "/?login=true"}
-                  className="mt-1 w-full flex items-center justify-center gap-1.5 glass-pill-orange text-[10px] font-extrabold uppercase tracking-wider py-2 px-4 cursor-pointer animate-pulse"
+                  className="mt-1 w-full flex items-center justify-center gap-1.5 glass-pill-orange text-[10px] font-extrabold uppercase tracking-wider py-2 px-4 cursor-pointer"
                 >
                   Sign In / Register
                 </button>

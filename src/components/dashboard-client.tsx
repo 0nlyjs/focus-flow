@@ -49,6 +49,51 @@ const INSPIRATIONAL_QUOTES = [
   "Take a deep breath, you've got this!",
   "Focus flows naturally.",
   "Make today cozy and focused.",
+  "Progress, not perfection.",
+  "Small steps lead to big change.",
+  "Keep your momentum going.",
+  "Every minute counts.",
+  "Trust the process.",
+  "You are doing great.",
+  "Stay curious, stay focused.",
+  "One task at a time.",
+  "Peace of mind brings focus.",
+  "Flow with the moment.",
+  "Find comfort in the work.",
+  "Celebrate your progress.",
+  "Consistency is your strength.",
+  "Breathe in, zoom out.",
+  "Step by step, goal by goal.",
+  "Energy flows where focus goes.",
+  "Quiet the mind, start the time.",
+  "Create your own pace.",
+  "Action breeds motivation.",
+  "Small efforts compound.",
+  "You are capable of great focus.",
+  "Just start, the rest will follow.",
+  "Believe you can and you will.",
+  "Keep it simple and keep going.",
+  "Make space for growth.",
+  "Your focus is your power.",
+  "Dive into your own zone.",
+  "Enjoy the journey of learning.",
+  "Stay present, stay focused.",
+  "The starting point is now.",
+  "Make progress at your own pace.",
+  "Calmness is key to focus.",
+  "Let go of distractions.",
+  "You are building something great.",
+  "Give yourself permission to focus.",
+  "Take it one breath at a time.",
+  "Keep showing up.",
+  "Effort is never wasted.",
+  "Keep moving forward.",
+  "Every step counts.",
+  "Slow down to speed up.",
+  "Be proud of taking action.",
+  "Build your flow, step by step.",
+  "Focus on the next tiny step.",
+  "Your dedication will pay off.",
 ];
 
 export default function DashboardClient({
@@ -58,8 +103,12 @@ export default function DashboardClient({
 }: DashboardClientProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
-  const [timeMode, setTimeMode] = useState<"countdown" | "countup">("countdown");
-  const [timerState, setTimerState] = useState<"idle" | "running" | "paused">("idle");
+  const [timeMode, setTimeMode] = useState<"countdown" | "countup">(
+    "countdown",
+  );
+  const [timerState, setTimerState] = useState<"idle" | "running" | "paused">(
+    "idle",
+  );
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -86,14 +135,35 @@ export default function DashboardClient({
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentQuote, setCurrentQuote] = useState(INSPIRATIONAL_QUOTES[0]);
+  const [greeting, setGreeting] = useState("");
+  const [dashboardQuote, setDashboardQuote] = useState("");
+
+  useEffect(() => {
+    const hours = new Date().getHours();
+    let greet = "Good evening";
+    if (hours >= 5 && hours < 12) {
+      greet = "Good morning";
+    } else if (hours >= 12 && hours < 17) {
+      greet = "Good afternoon";
+    }
+    const nameStr = !isGuest && user.name ? `, ${user.name.split(" ")[0]}` : "";
+    setGreeting(`${greet}${nameStr}`);
+
+    const randomIdx = Math.floor(Math.random() * INSPIRATIONAL_QUOTES.length);
+    setDashboardQuote(INSPIRATIONAL_QUOTES[randomIdx]);
+  }, [user.name, isGuest]);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Rotate quotes every focus session
+  // Rotate quotes every focus session sequentially in a loop
   useEffect(() => {
     if (activeTask) {
-      const randomIndex = Math.floor(Math.random() * INSPIRATIONAL_QUOTES.length);
-      setCurrentQuote(INSPIRATIONAL_QUOTES[randomIndex]);
+      const currentIndex = INSPIRATIONAL_QUOTES.indexOf(currentQuote);
+      const nextIndex =
+        currentIndex === -1
+          ? 0
+          : (currentIndex + 1) % INSPIRATIONAL_QUOTES.length;
+      setCurrentQuote(INSPIRATIONAL_QUOTES[nextIndex]);
     }
   }, [activeTask]);
 
@@ -235,7 +305,9 @@ export default function DashboardClient({
         if (queryReminderId) {
           // Delete old reminder
           await fetch(`/api/tasks/${queryReminderId}`, { method: "DELETE" });
-          setTasks((prev) => prev.filter((t) => t.id !== queryReminderId).concat(newTask));
+          setTasks((prev) =>
+            prev.filter((t) => t.id !== queryReminderId).concat(newTask),
+          );
         } else {
           setTasks((prev) => [newTask, ...prev]);
         }
@@ -245,10 +317,15 @@ export default function DashboardClient({
   };
 
   // API Request or local complete: Finish Task
-  const finishTaskRequest = async (taskId: string, spentTimeMinutes: number) => {
+  const finishTaskRequest = async (
+    taskId: string,
+    spentTimeMinutes: number,
+  ) => {
     if (isGuest) {
       const updated = tasks.map((t) =>
-        t.id === taskId ? { ...t, isCompleted: true, spentTime: spentTimeMinutes } : t
+        t.id === taskId
+          ? { ...t, isCompleted: true, spentTime: spentTimeMinutes }
+          : t,
       );
       saveGuestTasks(updated);
       setLoggedMinutes(spentTimeMinutes);
@@ -273,8 +350,10 @@ export default function DashboardClient({
       if (json.success) {
         setTasks((prev) =>
           prev.map((t) =>
-            t.id === taskId ? { ...t, isCompleted: true, spentTime: spentTimeMinutes } : t
-          )
+            t.id === taskId
+              ? { ...t, isCompleted: true, spentTime: spentTimeMinutes }
+              : t,
+          ),
         );
         setLoggedMinutes(spentTimeMinutes);
         setShowFinishSuccess(true);
@@ -325,7 +404,12 @@ export default function DashboardClient({
     }
 
     try {
-      const res = await logTaskInterval(activeTask.id, intervalTitle, finalSpent, activeTask.allocatedTime);
+      const res = await logTaskInterval(
+        activeTask.id,
+        intervalTitle,
+        finalSpent,
+        activeTask.allocatedTime,
+      );
       if (res.error) {
         throw new Error(res.error);
       }
@@ -397,7 +481,8 @@ export default function DashboardClient({
 
   const handleSignOut = () => {
     if (isGuest) {
-      document.cookie = "guest-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie =
+        "guest-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
       window.location.href = "/";
     } else {
       signOut({ callbackUrl: "/" });
@@ -414,7 +499,8 @@ export default function DashboardClient({
   const activeTasks = tasks.filter((t) => !t.isCompleted);
   const completedTasks = tasks.filter((t) => t.isCompleted);
 
-  const displayTime = timeMode === "countdown" ? secondsRemaining : secondsElapsed;
+  const displayTime =
+    timeMode === "countdown" ? secondsRemaining : secondsElapsed;
 
   const totalDuration = activeTask ? activeTask.allocatedTime * 60 : 1;
   const progressPercent =
@@ -438,26 +524,28 @@ export default function DashboardClient({
         {activeTask ? (
           /* Active Focus Timer State (Aesthetic Music Player Dial Style) */
           <div className="w-[min(640px,100%,calc(100vh-180px))] aspect-square mx-auto my-auto self-center flex flex-col items-center justify-center p-6 sm:p-8 glass-tray relative overflow-hidden shrink-0">
-            
             <div className="z-10 flex flex-col items-center gap-4 sm:gap-5 text-center max-w-lg w-full">
-              
               {/* Handwritten Cozy Encouragement Text */}
               <div className="font-caveat text-4xl text-[#7B52AB] animate-pulse py-0.5">
                 {currentQuote}
               </div>
- 
+
               <div className="flex flex-col gap-1.5">
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
                   {activeTask.title}
                 </h2>
                 <p className="text-[11px] text-slate-500 font-bold leading-relaxed max-w-sm mx-auto">
-                  Cozy session in progress. Quiet the noise, take slow breaths, and sink into your flow.
+                  Cozy session in progress. Quiet the noise, take slow breaths,
+                  and sink into your flow.
                 </p>
               </div>
- 
+
               {/* Animated Clock Circle Dial */}
               <div className="relative w-48 h-48 flex items-center justify-center bg-white/20 rounded-full border border-white/40 shadow-inner backdrop-blur-md shrink-0">
-                <svg className="absolute w-full h-full -rotate-90" viewBox="0 0 192 192">
+                <svg
+                  className="absolute w-full h-full -rotate-90"
+                  viewBox="0 0 192 192"
+                >
                   <circle
                     cx="96"
                     cy="96"
@@ -476,7 +564,7 @@ export default function DashboardClient({
                     strokeLinecap="round"
                   />
                 </svg>
-                
+
                 {/* Digital Clock reading */}
                 <div className="flex flex-col items-center z-10">
                   <span className="text-4xl font-black tracking-tight text-slate-900 font-mono">
@@ -487,7 +575,7 @@ export default function DashboardClient({
                   </span>
                 </div>
               </div>
- 
+
               {/* Cozy Play/Pause button wrapper */}
               <div className="p-2 flex items-center justify-center bg-white/20 rounded-full border border-white/40 shadow-inner backdrop-blur-md shrink-0">
                 {timerState === "running" ? (
@@ -508,7 +596,7 @@ export default function DashboardClient({
                   </button>
                 )}
               </div>
- 
+
               {/* Main Action Buttons */}
               <div className="grid grid-cols-2 gap-3.5 w-full mt-0.5 shrink-0">
                 <button
@@ -533,12 +621,14 @@ export default function DashboardClient({
         ) : (
           /* Config & Form Centered State */
           <div className="flex justify-center items-center w-full my-auto">
-            <div className="w-[min(640px,100%,calc(100vh-180px))] aspect-square p-8 sm:p-12 glass-tray flex flex-col justify-center gap-10">
-              <div className="flex flex-col text-left gap-2">
-                <h2 className="text-xl font-extrabold text-[#7B52AB] tracking-tight">Create Focus Block</h2>
-                <p className="text-xs text-slate-500 font-bold leading-relaxed">
-                  Designate a window of distraction-free work. Name your focus goal, configure your timer parameters, and dive in.
-                </p>
+            <div className="w-[min(640px,100%,calc(100vh-180px))] aspect-square p-8 sm:p-12 glass-tray flex flex-col justify-center gap-6">
+              <div className="flex flex-col text-left gap-2 -mt-4 pb-15">
+                <h2 className="text-4xl font-black text-[#7B52AB] tracking-tight">
+                  {greeting}
+                </h2>
+                <h2 className="text-lg font-semibold text-slate-500 italic">
+                  {dashboardQuote}
+                </h2>
               </div>
 
               {formError && (
@@ -549,7 +639,10 @@ export default function DashboardClient({
 
               <form onSubmit={handleStartFormSubmit} className="space-y-8">
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="title" className="text-xs font-bold text-slate-700 uppercase tracking-wide px-2">
+                  <label
+                    htmlFor="title"
+                    className="text-xs font-bold text-slate-700 uppercase tracking-wide px-2"
+                  >
                     What are you working on?
                   </label>
                   <input
@@ -566,14 +659,19 @@ export default function DashboardClient({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="flex flex-col gap-2">
-                    <label htmlFor="timeMode" className="text-xs font-bold text-slate-700 uppercase tracking-wide px-2">
+                    <label
+                      htmlFor="timeMode"
+                      className="text-xs font-bold text-slate-700 uppercase tracking-wide px-2"
+                    >
                       Timer Mode
                     </label>
                     <div className="relative">
                       <select
                         id="timeMode"
                         value={timeMode}
-                        onChange={(e) => setTimeMode(e.target.value as "countdown" | "countup")}
+                        onChange={(e) =>
+                          setTimeMode(e.target.value as "countdown" | "countup")
+                        }
                         className="w-full px-6 py-3.5 glass-pill-white text-slate-900 focus:outline-none transition-all text-sm font-bold appearance-none cursor-pointer shadow-sm"
                       >
                         <option value="countdown">Countdown Mode</option>
@@ -584,7 +682,10 @@ export default function DashboardClient({
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <label htmlFor="allocatedTime" className="text-xs font-bold text-slate-700 uppercase tracking-wide px-2">
+                    <label
+                      htmlFor="allocatedTime"
+                      className="text-xs font-bold text-slate-700 uppercase tracking-wide px-2"
+                    >
                       Allocated Time (Minutes)
                     </label>
                     <input
@@ -622,13 +723,21 @@ export default function DashboardClient({
             <div className="p-4 rounded-full bg-white/20 border border-white/45 shadow-inner backdrop-blur-md text-[#7B52AB] shrink-0">
               <History className="w-8 h-8 text-[#B88D15]" />
             </div>
-            
+
             <div className="flex flex-col gap-2">
               <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">
                 Log Focus Interval?
               </h3>
               <p className="text-xs text-slate-600 font-bold leading-relaxed max-w-sm">
-                This will save your current focus session of <strong className="text-[#7B52AB]">{Math.max(1, Math.round(secondsElapsed / 60))} {Math.max(1, Math.round(secondsElapsed / 60)) === 1 ? 'minute' : 'minutes'}</strong> to history, but keep this task open so you can continue it later.
+                This will save your current focus session of{" "}
+                <strong className="text-[#7B52AB]">
+                  {Math.max(1, Math.round(secondsElapsed / 60))}{" "}
+                  {Math.max(1, Math.round(secondsElapsed / 60)) === 1
+                    ? "minute"
+                    : "minutes"}
+                </strong>{" "}
+                to history, but keep this task open so you can continue it
+                later.
               </p>
             </div>
 
@@ -667,7 +776,12 @@ export default function DashboardClient({
                 Focus Block Completed
               </h3>
               <p className="text-xs text-slate-600 font-bold leading-relaxed max-w-sm">
-                You logged <strong className="text-[#7B52AB]">{loggedMinutes} {loggedMinutes === 1 ? 'minute' : 'minutes'}</strong> of uninterrupted flow. Celebrate your progress and take a cozy breath!
+                You logged{" "}
+                <strong className="text-[#7B52AB]">
+                  {loggedMinutes} {loggedMinutes === 1 ? "minute" : "minutes"}
+                </strong>{" "}
+                of uninterrupted flow. Celebrate your progress and take a cozy
+                breath!
               </p>
             </div>
 
