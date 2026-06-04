@@ -77,11 +77,11 @@ html {
 
 /* ─── Landing Page Glows ────────────────────────────────────────── */
 .lp-glow-1 {
-  background-color: rgba(225, 220, 197, 0.95) !important; /* Same as #D7D2BB but very slightly lighter to distinguish */
+  background-color: rgba(123, 82, 171, 0.08) !important; /* Elegant soft purple glow for light theme */
 }
 
 .lp-glow-2 {
-  background-color: rgba(215, 210, 187, 0.4) !important; /* Same color as right side (#D7D2BB) */
+  background-color: rgba(212, 168, 42, 0.08) !important; /* Cozy warm gold glow for light theme */
 }
 
 [data-theme="dark"] .lp-glow-1 {
@@ -253,7 +253,7 @@ html {
 
 body {
   background-color: var(--background);
-  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.12) 100%);
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(123, 82, 171, 0.03) 40%, rgba(62, 35, 97, 0.09) 100%);
   color: var(--foreground);
   font-family: var(--font-sintony), sans-serif;
   overflow-x: hidden;
