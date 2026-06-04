@@ -298,7 +298,7 @@ export default function DashboardLayout({
       </div>
 
       <div
-        className={`flex-1 flex overflow-hidden w-full px-4 sm:px-6 py-6 sm:py-8 gap-8 relative z-20 items-stretch transition-all duration-300
+        className={`flex-1 flex overflow-hidden w-full px-4 sm:px-6 gap-8 relative z-20 items-stretch transition-all duration-300
           ${isSidebarOpen ? "lg:pl-80" : "lg:pl-0"}
           ${isHistoryOpen ? "lg:pr-80" : "lg:pr-0"}
         `}

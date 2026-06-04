@@ -1,14 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FAF6E3;
+  --background: #D7D2BB;
   --foreground: #3E2361;
+  --card-bg: #FAF4D3; /* A beautiful, soft cream-yellow for the cards */
+  --card-shadow: 0 12px 32px -8px rgba(62, 35, 97, 0.12), 0 4px 12px -2px rgba(62, 35, 97, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  
+  /* Cohesive warm plum-slate colors for premium contrast in light theme */
+  --color-slate-900: #120920;
+  --color-slate-800: #221235;
+  --color-slate-700: #331D4B;
+  --color-slate-600: #472F64;
+  --color-slate-500: #5F457D;
+  --color-slate-450: #745B95;
+  --color-slate-400: #8B72AC;
 }
 
 html, body {
   margin: 0 !important;
   padding: 0 !important;
-  background-color: #FAF6E3;
+  background-color: #D7D2BB;
 }
 
 html {
@@ -29,8 +40,10 @@ html {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #FAF6E3;
+    --background: #D7D2BB;
     --foreground: #3E2361;
+    --card-bg: #C0BBA0;
+    --card-shadow: 0 12px 32px -8px rgba(62, 35, 97, 0.12), 0 4px 12px -2px rgba(62, 35, 97, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 }
 
@@ -38,6 +51,8 @@ html {
 [data-theme="dark"] {
   --background: #0F0A1A;
   --foreground: #EDE8F5;
+  --card-bg: #150D24;
+  --card-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.5), 0 4px 12px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   --lp-bg: #0F0A1A;
   --lp-bg-alt: #160D26;
   --lp-surface: rgba(30, 18, 50, 0.85);
@@ -60,11 +75,11 @@ html {
 
 /* ─── Landing Page Glows ────────────────────────────────────────── */
 .lp-glow-1 {
-  background-color: rgba(253, 251, 242, 0.95) !important; /* Same as #FAF6E3 but very slightly lighter to distinguish */
+  background-color: rgba(225, 220, 197, 0.95) !important; /* Same as #D7D2BB but very slightly lighter to distinguish */
 }
 
 .lp-glow-2 {
-  background-color: rgba(250, 246, 227, 0.4) !important; /* Same color as right side (#FAF6E3) */
+  background-color: rgba(215, 210, 187, 0.4) !important; /* Same color as right side (#D7D2BB) */
 }
 
 [data-theme="dark"] .lp-glow-1 {
@@ -235,7 +250,8 @@ html {
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.12) 100%);
   color: var(--foreground);
   font-family: var(--font-sintony), sans-serif;
   overflow-x: hidden;
@@ -314,13 +330,13 @@ body {
 
 /* Glassmorphism Styles matching the uploaded mockup */
 .glass-tray {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(123, 82, 171, 0.1) 100%) !important;
+  background: var(--card-bg) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
   border: 1.5px solid rgba(123, 82, 171, 0.25) !important;
-  box-shadow: none !important;
+  box-shadow: var(--card-shadow) !important;
   border-radius: 1.5rem !important; /* Elegant modern square-ish corners */
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, background-color 0.4s ease, box-shadow 0.3s ease;
 }
 
 .glass-pill-white {
@@ -357,16 +373,16 @@ body {
 }
 
 .glass-pill-orange {
-  background: linear-gradient(135deg, rgba(251, 146, 60, 1) 0%, rgba(249, 115, 22, 0.96) 100%) !important;
+  background: linear-gradient(135deg, #EAA86C 0%, #D87B37 100%) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border-top: 1.5px solid rgba(255, 255, 255, 0.9) !important;
   border-left: 1.5px solid rgba(255, 255, 255, 0.65) !important;
-  border-right: 1px solid rgba(249, 115, 22, 0.2) !important;
-  border-bottom: 1.5px solid rgba(194, 65, 12, 0.25) !important;
+  border-right: 1px solid rgba(216, 123, 55, 0.2) !important;
+  border-bottom: 1.5px solid rgba(180, 85, 30, 0.25) !important;
   box-shadow: 
-    0 16px 40px -4px rgba(249, 115, 22, 0.15),
-    0 6px 20px -2px rgba(249, 115, 22, 0.07),
+    0 16px 40px -4px rgba(216, 123, 55, 0.15),
+    0 6px 20px -2px rgba(216, 123, 55, 0.07),
     inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
   border-radius: 9999px !important;
   color: #3e2361 !important; /* Rich brand purple contrast */
@@ -375,10 +391,10 @@ body {
 }
 
 .glass-pill-orange:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(251, 146, 60, 1) 0%, rgba(249, 115, 22, 1) 100%) !important;
+  background: linear-gradient(135deg, #F4B37C 0%, #E27E36 100%) !important;
   box-shadow: 
-    0 20px 48px -4px rgba(249, 115, 22, 0.20),
-    0 8px 24px -2px rgba(249, 115, 22, 0.10),
+    0 20px 48px -4px rgba(216, 123, 55, 0.20),
+    0 8px 24px -2px rgba(216, 123, 55, 0.10),
     inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
   transform: translateY(-1px) scale(1.015);
 }
@@ -386,13 +402,13 @@ body {
 .glass-pill-orange:active:not(:disabled) {
   transform: translateY(1px) scale(0.985);
   box-shadow: 
-    0 6px 16px -4px rgba(249, 115, 22, 0.25),
+    0 6px 16px -4px rgba(216, 123, 55, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
 /* Glass-style Option inputs */
 select.glass-pill-white option {
-  background: #FAF6E3;
+  background: #D7D2BB;
   color: #3e2361;
 }
 
@@ -412,8 +428,9 @@ select.glass-pill-white option {
 }
 
 [data-theme="dark"] .glass-tray {
-  background: linear-gradient(135deg, rgba(30, 18, 50, 0.45) 0%, rgba(123, 82, 171, 0.1) 100%) !important;
+  background: var(--card-bg) !important;
   border-color: rgba(123, 82, 171, 0.35) !important;
+  box-shadow: var(--card-shadow) !important;
 }
 
 [data-theme="dark"] .glass-pill-white {
@@ -507,15 +524,23 @@ select.glass-pill-white option {
     inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+/* Hide scrollbar globally but keep scroll functionality */
+::-webkit-scrollbar {
+  display: none !important;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+
+/* Keep .no-scrollbar utility class for compatibility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 /* Hide number input spinners */
@@ -527,6 +552,23 @@ select.glass-pill-white option {
 
 .no-spinners {
   -moz-appearance: textfield; /* Firefox */
+}
+
+/* Custom warning card colors to prevent caching/compilation issues */
+.unsaved-session-alert {
+  color: #C2410C !important; /* Dark orange */
+}
+
+[data-theme="dark"] .unsaved-session-alert {
+  color: #F59E0B !important; /* Yellow-amber for dark theme */
+}
+
+.unsaved-session-body {
+  color: #120920 !important; /* Very dark plum */
+}
+
+[data-theme="dark"] .unsaved-session-body {
+  color: #A89FC0 !important; /* Light slate for dark theme */
 }
 
 

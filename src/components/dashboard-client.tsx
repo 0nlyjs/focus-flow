@@ -549,7 +549,7 @@ export default function DashboardClient({
       onSignOut={handleSignOut}
     >
       {/* Main Workspace with local scroll protection */}
-      <div className="flex-1 flex flex-col gap-8 pr-1 transition-all duration-300 overflow-y-auto">
+      <div className="flex-1 flex flex-col gap-8 pr-1 transition-all duration-300 overflow-y-auto py-6 sm:py-8">
         {activeTask ? (
           /* Active Focus Timer State (Aesthetic Music Player Dial Style) */
           <div className="w-[min(640px,100%,calc(100vh-180px))] aspect-square mx-auto my-auto self-center flex flex-col items-center justify-center p-6 sm:p-8 glass-tray relative overflow-hidden shrink-0">

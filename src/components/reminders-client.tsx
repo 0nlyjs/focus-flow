@@ -159,7 +159,7 @@ export default function RemindersClient({
       onDeleteTask={handleDeleteTask}
     >
       {/* Centered Main Workspace Container */}
-      <div className="flex-1 flex justify-center overflow-y-auto w-full transition-all duration-300">
+      <div className="flex-1 flex justify-center overflow-y-auto w-full transition-all duration-300 py-6 sm:py-8">
         <div className="w-full max-w-3xl flex flex-col gap-8 px-2 py-4">
           
           {/* Main Banner Heading */}
@@ -206,13 +206,13 @@ export default function RemindersClient({
           </div>
 
           {/* Active Reminders List / Grid */}
-          <div className="flex-1 flex flex-col gap-4 min-h-0">
+          <div className="flex flex-col gap-4">
             <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide px-1 flex items-center gap-2 shrink-0">
               <BellRing className="w-4.5 h-4.5 text-[#7B52AB]" />
               Reminders Queue ({activeTasks.length})
             </h3>
 
-            <div className="flex-1 overflow-y-auto pr-1 min-h-0 pb-4">
+            <div className="pb-4">
               {activeTasks.length === 0 ? (
                 <div className="p-10 glass-tray text-center flex flex-col items-center justify-center gap-4 py-16">
                   <div className="p-4 rounded-full bg-white/20 dark:bg-[#7B52AB]/15 border border-[#7B52AB]/20 shadow-inner backdrop-blur-md text-[#7B52AB] shrink-0">
@@ -230,16 +230,18 @@ export default function RemindersClient({
                   {activeTasks.map((t) => (
                     <div
                       key={t.id}
-                      className="glass-tray p-6 hover:scale-[1.02] hover:border-[#7B52AB]/50 transition-all duration-300 flex flex-col justify-between gap-5 text-left relative overflow-hidden group shadow-md"
+                      className="glass-tray h-48 p-6 hover:scale-[1.02] hover:border-[#7B52AB]/50 transition-all duration-300 flex flex-col justify-between gap-5 text-left relative overflow-hidden group shadow-md"
                     >
-                      <div className="flex-1 min-w-0">
-                        <span className="text-[10px] text-[#7B52AB] font-extrabold uppercase tracking-widest flex items-center gap-1.5 mb-2.5">
+                      <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+                        <span className="text-[10px] text-slate-700 font-extrabold uppercase tracking-widest flex items-center gap-1.5 mb-2.5 shrink-0">
                           <Calendar className="w-3.5 h-3.5" />
                           Focus Reminder
                         </span>
-                        <h4 className="font-black text-slate-900 text-sm leading-snug break-words group-hover:text-[#7B52AB] transition-colors">
-                          {t.title}
-                        </h4>
+                        <div className="flex-1 overflow-y-auto pr-1 no-scrollbar">
+                          <h4 className="font-black text-slate-900 text-sm leading-snug break-words group-hover:text-[#7B52AB] transition-colors">
+                            {t.title}
+                          </h4>
+                        </div>
                       </div>
 
                       <div className="flex items-center justify-between border-t border-[#7B52AB]/20 pt-4 shrink-0">
@@ -264,6 +266,8 @@ export default function RemindersClient({
               )}
             </div>
           </div>
+          {/* Explicit spacer to prevent clipping/margin collapsing on scroll container's last child */}
+          <div className="h-8 shrink-0" />
         </div>
       </div>
     </DashboardLayout>

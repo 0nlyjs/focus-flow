@@ -154,7 +154,7 @@ export default function AnalyticsClient({
       onDeleteTask={handleDeleteTask}
     >
       {/* Centered Main Workspace Container */}
-      <div className="flex-1 flex justify-center overflow-y-auto w-full transition-all duration-300">
+      <div className="flex-1 flex justify-center overflow-y-auto w-full transition-all duration-300 py-6 sm:py-8">
         <div className="w-full max-w-3xl flex flex-col gap-8 px-2 py-4">
           
           {/* Header Row */}
@@ -180,11 +180,11 @@ export default function AnalyticsClient({
             {/* Guest Warning Card */}
             {isGuest && (
               <div className="glass-tray border-amber-500/30 bg-amber-500/5 p-5 flex flex-col gap-2.5 max-w-sm w-full md:w-auto shadow-md">
-                <div className="flex items-center gap-2 text-amber-550 dark:text-amber-400">
+                <div className="flex items-center gap-2 unsaved-session-alert">
                   <AlertTriangle className="w-4 h-4 shrink-0" />
                   <span className="text-[10px] font-black uppercase tracking-widest">Unsaved Session</span>
                 </div>
-                <p className="text-[11px] text-slate-600 dark:text-slate-400 font-bold leading-normal">
+                <p className="text-[11px] font-bold leading-normal unsaved-session-body">
                   You are playing as a Guest. Your focus logs are saved only on this device. Sign in to back up your data so it is never lost.
                 </p>
                 <button
@@ -204,7 +204,7 @@ export default function AnalyticsClient({
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Clock className="w-20 h-20 text-[#7B52AB]" />
               </div>
-              <p className="text-[10px] font-extrabold text-[#7B52AB] uppercase tracking-wider mb-2">Total Focus Time</p>
+              <p className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-2">Total Focus Time</p>
               <h2 className="text-3xl font-black text-slate-900 tracking-tight font-mono mb-2">
                 {userTotalSpentMinutes.toLocaleString()}m
               </h2>
@@ -216,7 +216,7 @@ export default function AnalyticsClient({
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Trophy className="w-20 h-20 text-[#7B52AB]" />
               </div>
-              <p className="text-[10px] font-extrabold text-[#7B52AB] uppercase tracking-wider mb-2">Tasks Completed</p>
+              <p className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-2">Tasks Completed</p>
               <h2 className="text-3xl font-black text-slate-900 tracking-tight font-mono mb-2">
                 {userCompletedTasksCount.toLocaleString()}
               </h2>
@@ -228,7 +228,7 @@ export default function AnalyticsClient({
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Users className="w-20 h-20 text-[#7B52AB]" />
               </div>
-              <p className="text-[10px] font-extrabold text-[#7B52AB] uppercase tracking-wider mb-2">Total Creators</p>
+              <p className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-2">Total Creators</p>
               <h2 className="text-3xl font-black text-slate-900 tracking-tight font-mono mb-2">
                 {metrics.userCount.toLocaleString()}
               </h2>
@@ -238,7 +238,7 @@ export default function AnalyticsClient({
 
           {/* Your Focus Style Analytics */}
           <div className="w-full p-6 sm:p-8 glass-tray flex flex-col gap-6 text-left shrink-0 shadow-md">
-            <div className="flex items-center gap-2.5 text-[#7B52AB]">
+            <div className="flex items-center gap-2.5 text-slate-700">
               <History className="w-5 h-5" />
               <h2 className="text-lg font-extrabold text-slate-800 tracking-tight">Your Focus Rhythm</h2>
             </div>
@@ -289,6 +289,8 @@ export default function AnalyticsClient({
               </div>
             )}
           </div>
+          {/* Explicit spacer to prevent clipping/margin collapsing on scroll container's last child */}
+          <div className="h-8 shrink-0" />
         </div>
       </div>
     </DashboardLayout>
