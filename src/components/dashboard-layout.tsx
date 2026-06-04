@@ -229,8 +229,12 @@ export default function DashboardLayout({
         )}
       </div>
 
-      {/* Main Workspace Wrapper Container */}
-      <div className="flex-1 flex overflow-hidden max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 gap-8 relative z-10 items-stretch">
+      <div
+        className={`flex-1 flex overflow-hidden max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 gap-8 relative z-10 items-stretch transition-all duration-300
+          ${isSidebarOpen ? "lg:pl-80" : "lg:pl-0"}
+          ${isHistoryOpen ? "lg:pr-80" : "lg:pr-0"}
+        `}
+      >
         {children}
 
         {/* Sidebar History Drawer (Cozy Card Design) */}
