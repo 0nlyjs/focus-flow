@@ -137,6 +137,35 @@ export default function DashboardClient({
   const [currentQuote, setCurrentQuote] = useState(INSPIRATIONAL_QUOTES[0]);
   const [greeting, setGreeting] = useState("");
   const [dashboardQuote, setDashboardQuote] = useState("");
+  const [allocatedTimeVal, setAllocatedTimeVal] = useState("25");
+  const [isTimeModeOpen, setIsTimeModeOpen] = useState(false);
+  const [isAllocatedTimeOpen, setIsAllocatedTimeOpen] = useState(false);
+
+  const timeModeRef = useRef<HTMLDivElement>(null);
+  const allocatedTimeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (timeModeRef.current && !timeModeRef.current.contains(event.target as Node)) {
+        setIsTimeModeOpen(false);
+      }
+      if (allocatedTimeRef.current && !allocatedTimeRef.current.contains(event.target as Node)) {
+        setIsAllocatedTimeOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (timeMode === "countup") {
+      setAllocatedTimeVal("0");
+    } else if (allocatedTimeVal === "0") {
+      setAllocatedTimeVal("25");
+    }
+  }, [timeMode]);
 
   useEffect(() => {
     const hours = new Date().getHours();
@@ -661,19 +690,50 @@ export default function DashboardClient({
                     >
                       Timer Mode
                     </label>
-                    <div className="relative">
-                      <select
-                        id="timeMode"
-                        value={timeMode}
-                        onChange={(e) =>
-                          setTimeMode(e.target.value as "countdown" | "countup")
-                        }
-                        className="w-full px-6 py-3.5 glass-pill-white text-slate-900 focus:outline-none transition-all text-sm font-bold appearance-none cursor-pointer shadow-sm"
+                    <div className="relative" ref={timeModeRef}>
+                      <button
+                        type="button"
+                        onClick={() => setIsTimeModeOpen(!isTimeModeOpen)}
+                        className="w-full text-left px-6 py-3.5 glass-pill-white text-slate-900 focus:outline-none transition-all text-sm font-bold flex items-center justify-between cursor-pointer shadow-sm"
                       >
-                        <option value="countdown">Countdown Mode</option>
-                        <option value="countup">Count Up Mode</option>
-                      </select>
-                      <ChevronRight className="w-4 h-4 text-slate-500 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none rotate-90" />
+                        <span>
+                          {timeMode === "countdown" ? "Countdown Mode" : "Count Up Mode"}
+                        </span>
+                        <ChevronRight className={`w-4 h-4 text-slate-500 transition-transform ${isTimeModeOpen ? "-rotate-90" : "rotate-90"}`} />
+                      </button>
+
+                      {isTimeModeOpen && (
+                        <div className="absolute left-0 right-0 mt-2 z-50 bg-[#FAF6E3]/75 dark:bg-[#3E2361]/85 backdrop-blur-xl border border-[#7B52AB]/30 rounded-2xl py-2 overflow-hidden shadow-xl animate-modal-scale-up">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTimeMode("countdown");
+                              setIsTimeModeOpen(false);
+                            }}
+                            className={`w-full text-left px-6 py-2.5 text-sm font-bold transition-all cursor-pointer ${
+                              timeMode === "countdown"
+                                ? "bg-[#7B52AB]/15 text-[#3E2361]"
+                                : "text-slate-700 hover:text-slate-900 hover:bg-[#7B52AB]/5"
+                            }`}
+                          >
+                            Countdown Mode
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTimeMode("countup");
+                              setIsTimeModeOpen(false);
+                            }}
+                            className={`w-full text-left px-6 py-2.5 text-sm font-bold transition-all cursor-pointer ${
+                              timeMode === "countup"
+                                ? "bg-[#7B52AB]/15 text-[#3E2361]"
+                                : "text-slate-700 hover:text-slate-900 hover:bg-[#7B52AB]/5"
+                            }`}
+                          >
+                            Count Up Mode
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -684,23 +744,74 @@ export default function DashboardClient({
                     >
                       Allocated Time (Minutes)
                     </label>
-                    <input
-                      type="number"
-                      name="allocatedTime"
-                      id="allocatedTime"
-                      required={timeMode === "countdown"}
-                      min="1"
-                      max="180"
-                      defaultValue="25"
-                      disabled={timeMode === "countup"}
-                      className="px-6 py-3.5 glass-pill-white text-slate-900 disabled:opacity-55 disabled:cursor-not-allowed focus:outline-none transition-all text-sm font-bold shadow-sm"
-                    />
+                    <div className="relative" ref={allocatedTimeRef}>
+                      <input
+                        type="number"
+                        name="allocatedTime"
+                        id="allocatedTime"
+                        required={timeMode === "countdown"}
+                        min="1"
+                        max="360"
+                        value={allocatedTimeVal}
+                        onChange={(e) => setAllocatedTimeVal(e.target.value)}
+                        disabled={timeMode === "countup"}
+                        className="w-full pr-14 pl-6 py-3.5 glass-pill-white text-slate-900 disabled:opacity-55 disabled:cursor-not-allowed focus:outline-none transition-all text-sm font-bold shadow-sm no-spinners"
+                      />
+                      <button
+                        type="button"
+                        disabled={timeMode === "countup"}
+                        onClick={() => setIsAllocatedTimeOpen(!isAllocatedTimeOpen)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-200/20 text-slate-500 disabled:opacity-0 transition-all cursor-pointer flex items-center justify-center"
+                        title="Quick Select Time"
+                      >
+                        <ChevronRight className={`w-4 h-4 transition-transform ${isAllocatedTimeOpen ? "-rotate-90" : "rotate-90"}`} />
+                      </button>
+
+                      {isAllocatedTimeOpen && timeMode !== "countup" && (
+                        <div className="absolute left-0 right-0 mt-2 z-50 bg-[#FAF6E3]/75 dark:bg-[#3E2361]/85 backdrop-blur-xl border border-[#7B52AB]/30 rounded-2xl py-2 overflow-hidden shadow-xl animate-modal-scale-up max-h-60 overflow-y-auto no-scrollbar">
+                          {[
+                            { label: "5 minutes", value: "5" },
+                            { label: "10 minutes", value: "10" },
+                            { label: "15 minutes", value: "15" },
+                            { label: "30 minutes", value: "30" },
+                            { label: "1 hour (60m)", value: "60" },
+                            { label: "2 hours (120m)", value: "120" },
+                            { label: "3 hours (180m)", value: "180" },
+                          ].map((opt) => (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              onClick={() => {
+                                setAllocatedTimeVal(opt.value);
+                                setIsAllocatedTimeOpen(false);
+                              }}
+                              className={`w-full text-left px-6 py-2.5 text-sm font-bold transition-all cursor-pointer ${
+                                allocatedTimeVal === opt.value
+                                  ? "bg-[#7B52AB]/15 text-[#3E2361]"
+                                  : "text-slate-700 hover:text-slate-900 hover:bg-[#7B52AB]/5"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {timeMode === "countdown" && parseInt(allocatedTimeVal, 10) > 360 && (
+                      <p className="text-[11px] text-pink-600 font-bold px-2 mt-1">
+                        Maximum session is 6 hours (360 mins). Start small—great things are built step by step!
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={
+                    isSubmitting ||
+                    (timeMode === "countdown" &&
+                      (!allocatedTimeVal || parseInt(allocatedTimeVal, 10) > 360))
+                  }
                   className="w-full flex items-center justify-center gap-2 glass-pill-orange font-extrabold py-4 px-4 text-sm uppercase tracking-wider cursor-pointer disabled:opacity-50"
                 >
                   {isSubmitting ? "Creating..." : "Start Focus Session"}
@@ -714,7 +825,7 @@ export default function DashboardClient({
 
       {/* Log Interval Confirmation Modal */}
       {showLogIntervalConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#3E2361]/25 backdrop-blur-md animate-backdrop-fade">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-backdrop-fade">
           <div className="w-[min(420px,100%)] p-8 glass-tray flex flex-col items-center text-center gap-6 animate-modal-scale-up relative">
             <div className="p-4 rounded-full bg-white/20 border border-white/45 shadow-inner backdrop-blur-md text-[#7B52AB] shrink-0">
               <History className="w-8 h-8 text-[#B88D15]" />
@@ -757,7 +868,7 @@ export default function DashboardClient({
 
       {/* Finish Task Success Congratulation Modal */}
       {showFinishSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#3E2361]/25 backdrop-blur-md animate-backdrop-fade">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-backdrop-fade">
           <div className="w-[min(440px,100%)] p-8 glass-tray flex flex-col items-center text-center gap-6 animate-modal-scale-up relative">
             <div className="relative p-5 rounded-full bg-white/25 border border-white/50 shadow-inner backdrop-blur-md text-amber-500 shrink-0">
               <div className="absolute inset-0 bg-amber-400/20 blur-xl rounded-full" />

@@ -6,7 +6,6 @@ import {
   BellRing,
   Trash2,
   Play,
-  Sparkles,
   CheckCircle2,
   Calendar
 } from "lucide-react";
@@ -165,7 +164,7 @@ export default function RemindersClient({
           
           {/* Main Banner Heading */}
           <div className="flex flex-col gap-2 text-left shrink-0">
-            <div className="font-caveat text-4xl text-[#7B52AB] animate-pulse py-0.5">
+            <div className="font-caveat text-4xl text-[#7B52AB] py-0.5">
               My Study Corner
             </div>
             <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 leading-tight">
@@ -179,7 +178,6 @@ export default function RemindersClient({
           {/* Add Reminder Card Form */}
           <div className="w-full p-6 sm:p-8 glass-tray flex flex-col gap-6 shrink-0">
             <div className="flex items-center gap-2 text-[#7B52AB]">
-              <Sparkles className="w-5 h-5" />
               <h2 className="text-lg font-extrabold text-slate-800 tracking-tight">Create a Reminder</h2>
             </div>
 
@@ -203,7 +201,6 @@ export default function RemindersClient({
                 className="glass-pill-orange font-extrabold py-4 px-8 text-xs uppercase tracking-wider whitespace-nowrap cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shrink-0"
               >
                 {isSubmitting ? "Adding..." : "Add to Queue"}
-                <Sparkles className="w-4 h-4 fill-current" />
               </button>
             </form>
           </div>
