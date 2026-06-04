@@ -96,12 +96,147 @@ const INSPIRATIONAL_QUOTES = [
   "Your dedication will pay off.",
 ];
 
+// ────────────────────────────────────────────────────────────────────────────────
+// Focus History Monthly Calendar Widget
+// ────────────────────────────────────────────────────────────────────────────────
+interface FocusHistoryCalendarProps {
+  tasks: Task[];
+  selectedDate: Date;
+  onSelectDate: (date: Date) => void;
+}
+
+function FocusHistoryCalendar({ tasks, selectedDate, onSelectDate }: FocusHistoryCalendarProps) {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const handlePrevMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  };
+
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  
+  const firstDayIndex = new Date(year, month, 1).getDay();
+  const daysCount = new Date(year, month + 1, 0).getDate();
+
+  const days: { date: Date | null; dayNumber: number | null }[] = [];
+  for (let i = 0; i < firstDayIndex; i++) {
+    days.push({ date: null, dayNumber: null });
+  }
+  for (let d = 1; d <= daysCount; d++) {
+    days.push({ date: new Date(year, month, d), dayNumber: d });
+  }
+
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const getFocusTimeForDate = (date: Date) => {
+    const dateStr = date.toDateString();
+    return tasks
+      .filter(t => t.isCompleted && new Date(t.createdAt).toDateString() === dateStr)
+      .reduce((sum, t) => sum + t.spentTime, 0);
+  };
+
+  const monthName = currentMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+
+  return (
+    <div className="w-full glass-tray p-4 sm:p-5 flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-black text-[#3E2361] dark:text-[#EDE8F5] uppercase tracking-wider flex items-center gap-1.5">
+          <Clock className="w-3.5 h-3.5 text-[#B88D15]" />
+          Focus Calendar
+        </h3>
+        <div className="flex items-center gap-2.5 bg-white/20 dark:bg-white/5 border border-white/30 dark:border-white/10 px-2 py-1 rounded-lg">
+          <button
+            type="button"
+            onClick={handlePrevMonth}
+            className="p-0.5 rounded hover:bg-slate-200/20 text-[#3E2361] dark:text-[#EDE8F5] cursor-pointer animate-none"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+          <span className="text-[11px] font-black text-[#3E2361] dark:text-[#EDE8F5] select-none min-w-[85px] text-center">
+            {monthName}
+          </span>
+          <button
+            type="button"
+            onClick={handleNextMonth}
+            className="p-0.5 rounded hover:bg-slate-200/20 text-[#3E2361] dark:text-[#EDE8F5] cursor-pointer animate-none"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-7 gap-1">
+        {dayNames.map((d) => (
+          <div key={d} className="text-[9px] font-black text-slate-500 uppercase tracking-wider text-center py-0.5">
+            {d}
+          </div>
+        ))}
+
+        {days.map((item, idx) => {
+          if (item.date === null) {
+            return <div key={`empty-${idx}`} className="h-7 sm:h-8" />;
+          }
+
+          const dateVal = item.date;
+          const isSelected = dateVal.toDateString() === selectedDate.toDateString();
+          const isToday = dateVal.toDateString() === new Date().toDateString();
+          const focusTime = getFocusTimeForDate(dateVal);
+          const hasHistory = focusTime > 0;
+
+          return (
+            <button
+              key={`day-${idx}`}
+              type="button"
+              onClick={() => onSelectDate(dateVal)}
+              className={`h-7 sm:h-8 rounded-lg flex flex-col items-center justify-center relative cursor-pointer transition-all border text-[10px] sm:text-xs font-bold ${
+                isSelected
+                  ? "bg-[#7B52AB] text-white border-[#7B52AB] shadow-sm scale-[1.03]"
+                  : isToday
+                  ? "bg-white/35 dark:bg-white/10 text-[#3E2361] dark:text-white border-[#7B52AB]/40"
+                  : "bg-white/10 hover:bg-white/20 dark:bg-white/0 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 border-transparent"
+              }`}
+            >
+              <span>{item.dayNumber}</span>
+              {hasHistory && (
+                <span
+                  className={`absolute bottom-0.5 w-1 h-1 rounded-full ${
+                    isSelected ? "bg-amber-300 animate-pulse" : "bg-[#B88D15]"
+                  }`}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Selected Date Summary */}
+      <div className="border-t border-[#7B52AB]/10 pt-2.5 mt-0.5 flex flex-row items-center justify-between text-xs font-bold text-slate-550 w-full px-1">
+        <div>
+          {selectedDate.toDateString() === new Date().toDateString() ? (
+            <span>Today's Total Focus Time:</span>
+          ) : (
+            <span>Focus Time ({selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}):</span>
+          )}
+        </div>
+        <div className="text-base font-black text-[#7B52AB] dark:text-[#EDE8F5]">
+          {getFocusTimeForDate(selectedDate)} <span className="text-[10px] font-bold text-slate-500">mins</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardClient({
   user,
   initialTasks,
   isGuest = false,
 }: DashboardClientProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [timeMode, setTimeMode] = useState<"countdown" | "countup">(
     "countdown",
@@ -548,11 +683,11 @@ export default function DashboardClient({
       onDeleteTask={handleDeleteTask}
       onSignOut={handleSignOut}
     >
-      {/* Main Workspace with local scroll protection */}
-      <div className="flex-1 flex flex-col gap-8 pr-1 transition-all duration-300 overflow-y-auto py-6 sm:py-8">
+      {/* Scrollable single column dashboard workspace layout */}
+      <div className="flex-1 flex flex-col gap-6 pr-1 transition-all duration-300 overflow-y-auto py-6 sm:py-8 max-w-3xl mx-auto w-full items-stretch">
         {activeTask ? (
-          /* Active Focus Timer State (Aesthetic Music Player Dial Style) */
-          <div className="w-[min(640px,100%,calc(100vh-180px))] aspect-square mx-auto my-auto self-center flex flex-col items-center justify-center p-6 sm:p-8 glass-tray relative overflow-hidden shrink-0">
+          /* Active Focus Timer State (Aesthetic Music Player Dial Style - Rectangle Card) */
+          <div className="w-full p-8 sm:p-10 glass-tray relative overflow-hidden flex flex-col items-center justify-center gap-6 shrink-0">
             <div className="z-10 flex flex-col items-center gap-4 sm:gap-5 text-center max-w-lg w-full">
               {/* Handwritten Cozy Encouragement Text */}
               <div className="font-caveat text-4xl text-[#7B52AB] py-0.5">
@@ -566,7 +701,7 @@ export default function DashboardClient({
               </div>
 
               {/* Animated Clock Circle Dial */}
-              <div className="relative w-[230px] h-[230px] flex items-center justify-center bg-white/20 rounded-full border border-white/40 shadow-inner backdrop-blur-md shrink-0">
+              <div className="relative w-[210px] h-[210px] flex items-center justify-center bg-white/20 rounded-full border border-white/40 shadow-inner backdrop-blur-md shrink-0">
                 <svg
                   className="absolute w-full h-full -rotate-90"
                   viewBox="0 0 192 192"
@@ -644,183 +779,188 @@ export default function DashboardClient({
             </div>
           </div>
         ) : (
-          /* Config & Form Centered State */
-          <div className="flex justify-center items-center w-full my-auto">
-            <div className="w-[min(640px,100%,calc(100vh-180px))] aspect-square p-8 sm:p-12 glass-tray flex flex-col justify-center gap-6">
-              <div className="flex flex-col text-left gap-2 -mt-4 pb-15">
-                <h2 className="text-4xl font-black text-[#7B52AB] tracking-tight">
-                  {greeting}
-                </h2>
-                <h2 className="text-lg font-semibold text-slate-500 italic">
-                  {dashboardQuote}
-                </h2>
+          /* Config & Form Centered State - Rectangle Card */
+          <div className="w-full p-8 sm:p-10 glass-tray flex flex-col justify-center gap-6 shrink-0">
+            <div className="flex flex-col text-left gap-2">
+              <h2 className="text-4xl font-black text-[#7B52AB] tracking-tight">
+                {greeting}
+              </h2>
+              <h2 className="text-lg font-semibold text-slate-500 italic">
+                {dashboardQuote}
+              </h2>
+            </div>
+
+            {formError && (
+              <div className="p-3.5 rounded-xl border border-rose-300 bg-rose-50 text-rose-700 text-sm font-bold shadow-sm">
+                {formError}
+              </div>
+            )}
+
+            <form onSubmit={handleStartFormSubmit} className="space-y-6">
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="title"
+                  className="text-xs font-bold text-slate-700 uppercase tracking-wide px-2"
+                >
+                  What are you working on?
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  id="title"
+                  required
+                  value={taskTitle}
+                  onChange={(e) => setTaskTitle(e.target.value)}
+                  placeholder="e.g. Designing mockup, Writing docs..."
+                  className="px-6 py-3.5 glass-pill-white text-slate-900 placeholder-slate-400 focus:outline-none transition-all text-sm font-bold shadow-sm"
+                />
               </div>
 
-              {formError && (
-                <div className="p-3.5 rounded-xl border border-rose-300 bg-rose-50 text-rose-700 text-sm font-bold shadow-sm">
-                  {formError}
-                </div>
-              )}
-
-              <form onSubmit={handleStartFormSubmit} className="space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-2">
                   <label
-                    htmlFor="title"
+                    htmlFor="timeMode"
                     className="text-xs font-bold text-slate-700 uppercase tracking-wide px-2"
                   >
-                    What are you working on?
+                    Timer Mode
                   </label>
-                  <input
-                    type="text"
-                    name="title"
-                    id="title"
-                    required
-                    value={taskTitle}
-                    onChange={(e) => setTaskTitle(e.target.value)}
-                    placeholder="e.g. Designing mockup, Writing docs..."
-                    className="px-6 py-3.5 glass-pill-white text-slate-900 placeholder-slate-400 focus:outline-none transition-all text-sm font-bold shadow-sm"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="timeMode"
-                      className="text-xs font-bold text-slate-700 uppercase tracking-wide px-2"
+                  <div className="relative" ref={timeModeRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsTimeModeOpen(!isTimeModeOpen)}
+                      className="w-full text-left px-6 py-3.5 glass-pill-white text-slate-900 focus:outline-none transition-all text-sm font-bold flex items-center justify-between cursor-pointer shadow-sm"
                     >
-                      Timer Mode
-                    </label>
-                    <div className="relative" ref={timeModeRef}>
-                      <button
-                        type="button"
-                        onClick={() => setIsTimeModeOpen(!isTimeModeOpen)}
-                        className="w-full text-left px-6 py-3.5 glass-pill-white text-slate-900 focus:outline-none transition-all text-sm font-bold flex items-center justify-between cursor-pointer shadow-sm"
-                      >
-                        <span>
-                          {timeMode === "countdown" ? "Countdown Mode" : "Count Up Mode"}
-                        </span>
-                        <ChevronRight className={`w-4 h-4 text-slate-500 transition-transform ${isTimeModeOpen ? "-rotate-90" : "rotate-90"}`} />
-                      </button>
+                      <span>
+                        {timeMode === "countdown" ? "Countdown Mode" : "Count Up Mode"}
+                      </span>
+                      <ChevronRight className={`w-4 h-4 text-slate-500 transition-transform ${isTimeModeOpen ? "-rotate-90" : "rotate-90"}`} />
+                    </button>
 
-                      {isTimeModeOpen && (
-                        <div className="absolute left-0 right-0 mt-2 z-50 bg-[#FAF6E3]/75 dark:bg-[#3E2361]/85 backdrop-blur-xl border border-[#7B52AB]/30 rounded-2xl py-2 overflow-hidden shadow-xl animate-modal-scale-up">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setTimeMode("countdown");
-                              setIsTimeModeOpen(false);
-                            }}
-                            className={`w-full text-left px-6 py-2.5 text-sm font-bold transition-all cursor-pointer ${
-                              timeMode === "countdown"
-                                ? "bg-[#7B52AB]/15 text-[#3E2361]"
-                                : "text-slate-700 hover:text-slate-900 hover:bg-[#7B52AB]/5"
-                            }`}
-                          >
-                            Countdown Mode
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setTimeMode("countup");
-                              setIsTimeModeOpen(false);
-                            }}
-                            className={`w-full text-left px-6 py-2.5 text-sm font-bold transition-all cursor-pointer ${
-                              timeMode === "countup"
-                                ? "bg-[#7B52AB]/15 text-[#3E2361]"
-                                : "text-slate-700 hover:text-slate-900 hover:bg-[#7B52AB]/5"
-                            }`}
-                          >
-                            Count Up Mode
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="allocatedTime"
-                      className="text-xs font-bold text-slate-700 uppercase tracking-wide px-2"
-                    >
-                      Allocated Time (Minutes)
-                    </label>
-                    <div className="relative" ref={allocatedTimeRef}>
-                      <input
-                        type="number"
-                        name="allocatedTime"
-                        id="allocatedTime"
-                        required={timeMode === "countdown"}
-                        min="1"
-                        max="360"
-                        value={allocatedTimeVal}
-                        onChange={(e) => setAllocatedTimeVal(e.target.value)}
-                        disabled={timeMode === "countup"}
-                        className="w-full pr-14 pl-6 py-3.5 glass-pill-white text-slate-900 disabled:opacity-55 disabled:cursor-not-allowed focus:outline-none transition-all text-sm font-bold shadow-sm no-spinners"
-                      />
-                      <button
-                        type="button"
-                        disabled={timeMode === "countup"}
-                        onClick={() => setIsAllocatedTimeOpen(!isAllocatedTimeOpen)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-200/20 text-slate-500 disabled:opacity-0 transition-all cursor-pointer flex items-center justify-center"
-                        title="Quick Select Time"
-                      >
-                        <ChevronRight className={`w-4 h-4 transition-transform ${isAllocatedTimeOpen ? "-rotate-90" : "rotate-90"}`} />
-                      </button>
-
-                      {isAllocatedTimeOpen && timeMode !== "countup" && (
-                        <div className="absolute left-0 right-0 mt-2 z-50 bg-[#FAF6E3]/75 dark:bg-[#3E2361]/85 backdrop-blur-xl border border-[#7B52AB]/30 rounded-2xl py-2 overflow-hidden shadow-xl animate-modal-scale-up max-h-60 overflow-y-auto no-scrollbar">
-                          {[
-                            { label: "5 minutes", value: "5" },
-                            { label: "10 minutes", value: "10" },
-                            { label: "15 minutes", value: "15" },
-                            { label: "30 minutes", value: "30" },
-                            { label: "1 hour (60m)", value: "60" },
-                            { label: "2 hours (120m)", value: "120" },
-                            { label: "3 hours (180m)", value: "180" },
-                          ].map((opt) => (
-                            <button
-                              key={opt.value}
-                              type="button"
-                              onClick={() => {
-                                setAllocatedTimeVal(opt.value);
-                                setIsAllocatedTimeOpen(false);
-                              }}
-                              className={`w-full text-left px-6 py-2.5 text-sm font-bold transition-all cursor-pointer ${
-                                allocatedTimeVal === opt.value
-                                  ? "bg-[#7B52AB]/15 text-[#3E2361]"
-                                  : "text-slate-700 hover:text-slate-900 hover:bg-[#7B52AB]/5"
-                              }`}
-                            >
-                              {opt.label}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    {timeMode === "countdown" && parseInt(allocatedTimeVal, 10) > 360 && (
-                      <p className="text-[11px] text-pink-600 font-bold px-2 mt-1">
-                        Maximum session is 6 hours (360 mins). Start small—great things are built step by step!
-                      </p>
+                    {isTimeModeOpen && (
+                      <div className="absolute left-0 right-0 mt-2 z-50 bg-[#FAF6E3]/75 dark:bg-[#3E2361]/85 backdrop-blur-xl border border-[#7B52AB]/30 rounded-2xl py-2 overflow-hidden shadow-xl animate-modal-scale-up">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTimeMode("countdown");
+                            setIsTimeModeOpen(false);
+                          }}
+                          className={`w-full text-left px-6 py-2.5 text-sm font-bold transition-all cursor-pointer ${
+                            timeMode === "countdown"
+                              ? "bg-[#7B52AB]/15 text-[#3E2361]"
+                              : "text-slate-700 hover:text-slate-900 hover:bg-[#7B52AB]/5"
+                          }`}
+                        >
+                          Countdown Mode
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTimeMode("countup");
+                            setIsTimeModeOpen(false);
+                          }}
+                          className={`w-full text-left px-6 py-2.5 text-sm font-bold transition-all cursor-pointer ${
+                            timeMode === "countup"
+                              ? "bg-[#7B52AB]/15 text-[#3E2361]"
+                              : "text-slate-700 hover:text-slate-900 hover:bg-[#7B52AB]/5"
+                          }`}
+                        >
+                          Count Up Mode
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={
-                    isSubmitting ||
-                    (timeMode === "countdown" &&
-                      (!allocatedTimeVal || parseInt(allocatedTimeVal, 10) > 360))
-                  }
-                  className="w-full flex items-center justify-center gap-2 glass-pill-orange font-extrabold py-4 px-4 text-sm uppercase tracking-wider cursor-pointer disabled:opacity-50"
-                >
-                  {isSubmitting ? "Creating..." : "Start Focus Session"}
-                  <Play className="w-4 h-4 fill-current transition-transform group-hover:scale-105" />
-                </button>
-              </form>
-            </div>
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="allocatedTime"
+                    className="text-xs font-bold text-slate-700 uppercase tracking-wide px-2"
+                  >
+                    Allocated Time (Minutes)
+                  </label>
+                  <div className="relative" ref={allocatedTimeRef}>
+                    <input
+                      type="number"
+                      name="allocatedTime"
+                      id="allocatedTime"
+                      required={timeMode === "countdown"}
+                      min="1"
+                      max="360"
+                      value={allocatedTimeVal}
+                      onChange={(e) => setAllocatedTimeVal(e.target.value)}
+                      disabled={timeMode === "countup"}
+                      className="w-full pr-14 pl-6 py-3.5 glass-pill-white text-slate-900 disabled:opacity-55 disabled:cursor-not-allowed focus:outline-none transition-all text-sm font-bold shadow-sm no-spinners"
+                    />
+                    <button
+                      type="button"
+                      disabled={timeMode === "countup"}
+                      onClick={() => setIsAllocatedTimeOpen(!isAllocatedTimeOpen)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-200/20 text-slate-500 disabled:opacity-0 transition-all cursor-pointer flex items-center justify-center"
+                      title="Quick Select Time"
+                    >
+                      <ChevronRight className={`w-4 h-4 transition-transform ${isAllocatedTimeOpen ? "-rotate-90" : "rotate-90"}`} />
+                    </button>
+
+                    {isAllocatedTimeOpen && timeMode !== "countup" && (
+                      <div className="absolute left-0 right-0 mt-2 z-50 bg-[#FAF6E3]/75 dark:bg-[#3E2361]/85 backdrop-blur-xl border border-[#7B52AB]/30 rounded-2xl py-2 overflow-hidden shadow-xl animate-modal-scale-up max-h-60 overflow-y-auto no-scrollbar">
+                        {[
+                          { label: "5 minutes", value: "5" },
+                          { label: "10 minutes", value: "10" },
+                          { label: "15 minutes", value: "15" },
+                          { label: "30 minutes", value: "30" },
+                          { label: "1 hour (60m)", value: "60" },
+                          { label: "2 hours (120m)", value: "120" },
+                          { label: "3 hours (180m)", value: "180" },
+                        ].map((opt) => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => {
+                              setAllocatedTimeVal(opt.value);
+                              setIsAllocatedTimeOpen(false);
+                            }}
+                            className={`w-full text-left px-6 py-2.5 text-sm font-bold transition-all cursor-pointer ${
+                              allocatedTimeVal === opt.value
+                                ? "bg-[#7B52AB]/15 text-[#3E2361]"
+                                : "text-slate-700 hover:text-slate-900 hover:bg-[#7B52AB]/5"
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {timeMode === "countdown" && parseInt(allocatedTimeVal, 10) > 360 && (
+                    <p className="text-[11px] text-pink-600 font-bold px-2 mt-1">
+                      Maximum session is 6 hours (360 mins). Start small—great things are built step by step!
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={
+                  isSubmitting ||
+                  (timeMode === "countdown" &&
+                    (!allocatedTimeVal || parseInt(allocatedTimeVal, 10) > 360))
+                }
+                className="w-full flex items-center justify-center gap-2 glass-pill-orange font-extrabold py-4 px-4 text-sm uppercase tracking-wider cursor-pointer disabled:opacity-50"
+              >
+                {isSubmitting ? "Creating..." : "Start Focus Session"}
+                <Play className="w-4 h-4 fill-current transition-transform group-hover:scale-105" />
+              </button>
+            </form>
           </div>
         )}
+
+        {/* Calendar widget at bottom */}
+        <FocusHistoryCalendar
+          tasks={tasks}
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+        />
       </div>
 
       {/* Log Interval Confirmation Modal */}

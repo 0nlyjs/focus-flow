@@ -539,26 +539,26 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-3.5">
             <h4 className={`lp-h4 text-xs font-black uppercase tracking-wider ${isDark ? "text-[#EDE8F5]" : "text-slate-800"}`}>Product</h4>
-            <a href="#features" className={`lp-footer-link text-xs font-bold transition-colors ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Features</a>
-            <a href="#methodology" className={`lp-footer-link text-xs font-bold transition-colors ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Methodology</a>
-            <a href="#pricing" className={`lp-footer-link text-xs font-bold transition-colors ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Pricing</a>
+            <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Features</button>
+            <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Methodology</button>
+            <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Pricing</button>
             <form action={handleGuestLogin} className="inline">
               <button type="submit" className={`lp-footer-link text-xs font-bold transition-colors block text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Guest Mode</button>
             </form>
           </div>
           <div className="flex flex-col gap-3.5">
             <h4 className={`lp-h4 text-xs font-black uppercase tracking-wider ${isDark ? "text-[#EDE8F5]" : "text-slate-800"}`}>Resources</h4>
-            <a href="#" className={`lp-footer-link text-xs font-bold transition-colors ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Blog</a>
-            <a href="#" className={`lp-footer-link text-xs font-bold transition-colors ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Guides</a>
-            <a href="#" className={`lp-footer-link text-xs font-bold transition-colors ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Community</a>
-            <a href="#" className={`lp-footer-link text-xs font-bold transition-colors ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Help Center</a>
+            <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Blog</button>
+            <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Guides</button>
+            <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Community</button>
+            <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Help Center</button>
           </div>
           <div className="flex flex-col gap-3.5">
             <h4 className={`lp-h4 text-xs font-black uppercase tracking-wider ${isDark ? "text-[#EDE8F5]" : "text-slate-800"}`}>Company</h4>
-            <a href="#" className={`lp-footer-link text-xs font-bold transition-colors ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>About Us</a>
-            <a href="#" className={`lp-footer-link text-xs font-bold transition-colors ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Careers</a>
-            <a href="#" className={`lp-footer-link text-xs font-bold transition-colors ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Press</a>
-            <a href="#" className={`lp-footer-link text-xs font-bold transition-colors ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Contact</a>
+            <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>About Us</button>
+            <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Careers</button>
+            <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Press</button>
+            <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Contact</button>
           </div>
         </div>
         <div className={`mx-auto max-w-7xl px-6 border-t mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 ${isDark ? "border-[rgba(123,82,171,0.12)]" : "border-slate-150"}`}>
