@@ -24,12 +24,23 @@ export default function InteractiveParticles() {
     }> = [];
 
     // Colors matching the FocusFlow aesthetic: purple, gold, soft lavender, and cream yellow glow
-    const colors = [
+    const lightColors = [
       "rgba(184, 141, 21, 0.28)",  // #B88D15 (Gold)
       "rgba(123, 82, 171, 0.28)",  // #7B52AB (Purple)
       "rgba(234, 219, 247, 0.28)", // #EADBF7 (Soft lavender)
       "rgba(250, 246, 227, 0.35)"  // #FAF6E3 (Cream yellow glow)
     ];
+
+    // Complement colors for dark theme: vibrant gold, purple, cyan, and rose
+    const darkColors = [
+      "rgba(212, 168, 42, 0.35)",  // #D4A82A (Vibrant Gold)
+      "rgba(155, 114, 204, 0.35)",  // #9B72CC (Vibrant Purple)
+      "rgba(56, 189, 248, 0.3)",   // Cyan/Blue (Complement color)
+      "rgba(244, 63, 94, 0.3)"      // Pink/Rose (Complement color)
+    ];
+
+    let isDarkTheme = typeof document !== "undefined" && document.documentElement.getAttribute("data-theme") === "dark";
+    const getColors = () => (isDarkTheme ? darkColors : lightColors);
 
     let targetScrollY = typeof window !== "undefined" ? window.scrollY : 0;
     let currentScrollY = targetScrollY;
@@ -43,6 +54,7 @@ export default function InteractiveParticles() {
 
     const initParticles = () => {
       particles = [];
+      const currentColors = getColors();
       // Dynamic particle count depending on viewport area (increased by 10%)
       const numberOfParticles = Math.min(88, Math.floor(((canvas.width * canvas.height) / 22000) * 1.1));
       for (let i = 0; i < numberOfParticles; i++) {
@@ -55,7 +67,7 @@ export default function InteractiveParticles() {
           vx: (Math.random() - 0.5) * 0.35,
           vy: (Math.random() - 0.5) * 0.35,
           radius,
-          color: colors[Math.floor(Math.random() * colors.length)]
+          color: currentColors[Math.floor(Math.random() * currentColors.length)]
         });
       }
     };
@@ -78,7 +90,8 @@ export default function InteractiveParticles() {
 
           if (dist < 120) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(123, 82, 171, ${0.18 * (1 - dist / 120)})`;
+            const connectionColor = isDarkTheme ? "155, 114, 204" : "123, 82, 171";
+            ctx.strokeStyle = `rgba(${connectionColor}, ${0.18 * (1 - dist / 120)})`;
             ctx.lineWidth = 0.8;
             ctx.moveTo(particles[a].x, particles[a].y);
             ctx.lineTo(particles[b].x, particles[b].y);
@@ -153,11 +166,26 @@ export default function InteractiveParticles() {
     window.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseleave", handleMouseLeave);
 
+    // MutationObserver to dynamically update particle theme and colors
+    const observer = new MutationObserver(() => {
+      const newIsDark = document.documentElement.getAttribute("data-theme") === "dark";
+      if (newIsDark !== isDarkTheme) {
+        isDarkTheme = newIsDark;
+        const currentColors = getColors();
+        particles.forEach((p) => {
+          p.color = currentColors[Math.floor(Math.random() * currentColors.length)];
+        });
+      }
+    });
+
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
     return () => {
       window.removeEventListener("resize", resizeCanvas);
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
+      observer.disconnect();
       cancelAnimationFrame(animationFrameId);
     };
   }, []);

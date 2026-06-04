@@ -15,7 +15,9 @@ import {
   BellRing,
   Clock,
   LayoutDashboard,
-  CheckCircle2
+  CheckCircle2,
+  Sun,
+  Moon
 } from "lucide-react";
 
 interface Task {
@@ -51,8 +53,21 @@ export default function DashboardLayout({
 }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "light") {
+      setIsDark(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  }, [isDark]);
 
   const activeTasks = tasks.filter((t) => !t.isCompleted);
   const completedTasks = tasks.filter((t) => t.isCompleted);
@@ -87,7 +102,7 @@ export default function DashboardLayout({
     <div className="h-screen flex flex-col justify-between bg-transparent overflow-hidden">
 
       {/* Header Top Bar */}
-      <header className="bg-[#8869AA]/85 backdrop-blur-lg sticky top-0 z-40 shadow-sm animate-navbar-wave relative shrink-0">
+      <header className="lp-header bg-[#8869AA]/85 backdrop-blur-lg sticky top-0 z-40 shadow-sm animate-navbar-wave relative shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
@@ -99,6 +114,30 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Dark / Light toggle */}
+            <button
+              id="theme-toggle"
+              aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+              onClick={() => setIsDark((d) => !d)}
+              className={`w-12 h-7 rounded-full border transition-all duration-300 flex items-center p-0.5 shadow-inner backdrop-blur-md cursor-pointer shrink-0 ${
+                isDark
+                  ? "border-cyan-400/30 bg-cyan-500/10 shadow-[0_0_12px_rgba(34,211,238,0.07)]"
+                  : "border-amber-400/30 bg-amber-500/10 shadow-[0_0_12px_rgba(245,158,11,0.05)]"
+              }`}
+            >
+              <span
+                className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 bg-white shadow-[0_0_8px_rgba(255,255,255,0.17)] ${
+                  isDark ? "translate-x-5" : "translate-x-0"
+                }`}
+              >
+                {isDark ? (
+                  <Moon className="w-3.5 h-3.5 text-cyan-500 fill-cyan-500/10" />
+                ) : (
+                  <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-500/10" />
+                )}
+              </span>
+            </button>
+
             {/* Minimal indicator */}
             <span className="hidden sm:inline text-xs font-extrabold uppercase tracking-wider text-[#B88D15]">
               {isGuest ? "Sandbox Mode" : "Registered Member"}
