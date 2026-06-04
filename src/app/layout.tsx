@@ -30,7 +30,7 @@ export default function RootLayout({
       lang="en"
       className={`${sintony.variable} ${caveat.variable} h-full antialiased`}
     >
-      <body className="h-full flex flex-col bg-[#FAF6E3] text-slate-800 selection:bg-[#7B52AB]/20 selection:text-[#3E2361] relative overflow-hidden">
+      <body className="min-h-full flex flex-col bg-[#FAF6E3] text-slate-800 selection:bg-[#7B52AB]/20 selection:text-[#3E2361] relative">
         <InteractiveParticles />
         {/* Persistent background glows wrapped to prevent overflow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -39,7 +39,7 @@ export default function RootLayout({
         </div>
 
         {/* Root content wrapper */}
-        <div className="relative z-10 flex-1 flex flex-col h-screen overflow-hidden">
+        <div className="relative z-10 flex-1 flex flex-col min-h-screen">
           {children}
         </div>
       </body>
