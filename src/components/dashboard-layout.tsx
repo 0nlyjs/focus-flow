@@ -279,35 +279,44 @@ export default function DashboardLayout({
                   No completed focus logs yet.
                 </div>
               ) : (
-                completedTasks.map((t) => (
-                  <div
-                    key={t.id}
-                    className="p-4 rounded-2xl border border-[#B88D15]/20 bg-[#FAF6E3]/40 backdrop-blur-md hover:bg-[#FAF6E3]/60 hover:border-[#7B52AB]/35 transition-all flex items-start justify-between gap-3 group shadow-sm"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-slate-600 text-sm line-through decoration-slate-350 truncate">
-                        {t.title}
-                      </p>
-                      <div className="flex items-center gap-3 mt-1.5 text-xs font-bold text-slate-500">
-                        <span className="flex items-center gap-1 text-emerald-600 font-extrabold">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                          Done
-                        </span>
-                        <span>•</span>
-                        <span>Logged: {t.spentTime}m</span>
+                completedTasks.map((t) => {
+                  const isChunk = /\[chunk:[^\]]+\]$/.test(t.title);
+                  const cleanTitle = t.title.replace(/\s\[chunk:[^\]]+\]$/, "");
+                  return (
+                    <div
+                      key={t.id}
+                      className="p-4 rounded-2xl border border-[#B88D15]/20 bg-[#FAF6E3]/40 backdrop-blur-md hover:bg-[#FAF6E3]/60 hover:border-[#7B52AB]/35 transition-all flex items-start justify-between gap-3 group shadow-sm"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-slate-600 text-sm line-through decoration-slate-350 truncate flex items-center flex-wrap gap-1.5">
+                          <span className="truncate">{cleanTitle}</span>
+                          {isChunk && (
+                            <span className="text-[8px] bg-amber-100/70 text-[#B88D15] border border-[#B88D15]/30 font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0 leading-none">
+                              Chunk
+                            </span>
+                          )}
+                        </p>
+                        <div className="flex items-center gap-3 mt-1.5 text-xs font-bold text-slate-500">
+                          <span className="flex items-center gap-1 text-emerald-600 font-extrabold">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                            {isChunk ? "Logged" : "Done"}
+                          </span>
+                          <span>•</span>
+                          <span>Logged: {t.spentTime}m</span>
+                        </div>
                       </div>
+                      {onDeleteTask && (
+                        <button
+                          onClick={() => onDeleteTask(t.id)}
+                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-650 cursor-pointer transition-all"
+                          title="Delete permanently"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
-                    {onDeleteTask && (
-                      <button
-                        onClick={() => onDeleteTask(t.id)}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-650 cursor-pointer transition-all"
-                        title="Delete permanently"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

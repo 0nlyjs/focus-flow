@@ -19,11 +19,10 @@ import {
   History,
   Sparkles,
   Music,
-  SkipForward,
-  SkipBack,
+  Trophy,
 } from "lucide-react";
-import { createTask } from "@/app/actions/task-actions";
-import { useSearchParams } from "next/navigation";
+import { createTask, logTaskChunk } from "@/app/actions/task-actions";
+import { useSearchParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/components/dashboard-layout";
 
 interface Task {
@@ -63,6 +62,7 @@ export default function DashboardClient({
   const [timerState, setTimerState] = useState<"idle" | "running" | "paused">("idle");
 
   const searchParams = useSearchParams();
+  const router = useRouter();
   const queryTitle = searchParams.get("title");
   const queryReminderId = searchParams.get("reminderId");
 
@@ -77,6 +77,10 @@ export default function DashboardClient({
   // Timer values in seconds
   const [secondsRemaining, setSecondsRemaining] = useState(0);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
+
+  const [showLogChunkConfirm, setShowLogChunkConfirm] = useState(false);
+  const [showFinishSuccess, setShowFinishSuccess] = useState(false);
+  const [loggedMinutes, setLoggedMinutes] = useState(0);
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
@@ -247,10 +251,8 @@ export default function DashboardClient({
         t.id === taskId ? { ...t, isCompleted: true, spentTime: spentTimeMinutes } : t
       );
       saveGuestTasks(updated);
-      setActiveTask(null);
-      setTimerState("idle");
-      setSecondsRemaining(0);
-      setSecondsElapsed(0);
+      setLoggedMinutes(spentTimeMinutes);
+      setShowFinishSuccess(true);
       return;
     }
 
@@ -274,10 +276,8 @@ export default function DashboardClient({
             t.id === taskId ? { ...t, isCompleted: true, spentTime: spentTimeMinutes } : t
           )
         );
-        setActiveTask(null);
-        setTimerState("idle");
-        setSecondsRemaining(0);
-        setSecondsElapsed(0);
+        setLoggedMinutes(spentTimeMinutes);
+        setShowFinishSuccess(true);
       }
     } catch (err) {
       console.error(err);
@@ -289,6 +289,69 @@ export default function DashboardClient({
     if (!activeTask) return;
     const finalSpent = Math.max(1, Math.round(secondsElapsed / 60));
     finishTaskRequest(activeTask.id, finalSpent);
+  };
+
+  const handleLogProgressActive = () => {
+    setShowLogChunkConfirm(true);
+  };
+
+  const confirmLogProgressActive = async () => {
+    setShowLogChunkConfirm(false);
+    if (!activeTask) return;
+    const finalSpent = Math.max(1, Math.round(secondsElapsed / 60));
+
+    const chunkTitle = `${activeTask.title} [chunk:${activeTask.id}]`;
+
+    if (isGuest) {
+      const guestChunk: Task = {
+        id: crypto.randomUUID(),
+        title: chunkTitle,
+        allocatedTime: activeTask.allocatedTime,
+        spentTime: finalSpent,
+        isCompleted: true,
+        createdAt: new Date().toISOString(),
+      };
+
+      const updated = [guestChunk, ...tasks];
+      saveGuestTasks(updated);
+
+      // Reset timer state and exit UI
+      setActiveTask(null);
+      setTimerState("idle");
+      setSecondsElapsed(0);
+      setSecondsRemaining(0);
+      router.push("/dashboard");
+      return;
+    }
+
+    try {
+      const res = await logTaskChunk(activeTask.id, chunkTitle, finalSpent, activeTask.allocatedTime);
+      if (res.error) {
+        throw new Error(res.error);
+      }
+      if (res.success && res.task) {
+        setTasks((prev) => [res.task as Task, ...prev]);
+
+        // Reset timer state and exit UI
+        setActiveTask(null);
+        setTimerState("idle");
+        setSecondsElapsed(0);
+        setSecondsRemaining(0);
+        router.push("/dashboard");
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || "Error logging task progress.");
+    }
+  };
+
+  const handleExitToDashboard = () => {
+    setShowFinishSuccess(false);
+    setActiveTask(null);
+    setTimerState("idle");
+    setSecondsRemaining(0);
+    setSecondsElapsed(0);
+    router.push("/dashboard");
   };
 
   // API Request or local delete: Delete Task
@@ -425,60 +488,46 @@ export default function DashboardClient({
                 </div>
               </div>
  
-              {/* Cute music Lo-fi controls bar */}
-              <div className="p-2.5 w-56 glass-pill-white flex items-center justify-between shrink-0">
-                <button
-                  onClick={() => {
-                    if (confirm("Cancel session? Focus progress will not be saved.")) {
-                      setActiveTask(null);
-                      setTimerState("idle");
-                      setSecondsRemaining(0);
-                      setSecondsElapsed(0);
-                    }
-                  }}
-                  className="p-1 rounded-full text-slate-500 hover:text-rose-500 transition-colors cursor-pointer"
-                  title="Cancel Focus"
-                >
-                  <SkipBack className="w-3.5 h-3.5 fill-current" />
-                </button>
- 
-                <div className="flex items-center gap-3.5">
-                  {timerState === "running" ? (
-                    <button
-                      onClick={() => setTimerState("paused")}
-                      className="p-2 rounded-full bg-[#7B52AB]/70 hover:bg-[#7B52AB]/85 text-white shadow-md transition-all border border-[#7B52AB]/20 cursor-pointer"
-                      title="Pause Timer"
-                    >
-                      <Pause className="w-4 h-4 fill-current" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setTimerState("running")}
-                      className="p-2 rounded-full bg-[#7B52AB]/75 hover:bg-[#7B52AB]/90 border border-[#7B52AB]/30 text-white shadow-md transition-all animate-bounce cursor-pointer"
-                      title="Resume Timer"
-                    >
-                      <Play className="w-4 h-4 fill-current" />
-                    </button>
-                  )}
-                </div>
- 
-                <button
-                  onClick={handleFinishActive}
-                  className="p-1 rounded-full text-emerald-600 hover:text-emerald-700 transition-colors cursor-pointer"
-                  title="Finish Task"
-                >
-                  <SkipForward className="w-3.5 h-3.5 fill-current" />
-                </button>
+              {/* Cozy Play/Pause button wrapper */}
+              <div className="p-2 flex items-center justify-center bg-white/20 rounded-full border border-white/40 shadow-inner backdrop-blur-md shrink-0">
+                {timerState === "running" ? (
+                  <button
+                    onClick={() => setTimerState("paused")}
+                    className="p-3.5 rounded-full bg-[#7B52AB]/70 hover:bg-[#7B52AB]/85 text-white shadow-md transition-all border border-[#7B52AB]/20 cursor-pointer"
+                    title="Pause Timer"
+                  >
+                    <Pause className="w-5 h-5 fill-current" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setTimerState("running")}
+                    className="p-3.5 rounded-full bg-[#7B52AB]/75 hover:bg-[#7B52AB]/90 border border-[#7B52AB]/30 text-white shadow-md transition-all cursor-pointer"
+                    title="Resume Timer"
+                  >
+                    <Play className="w-5 h-5 fill-current" />
+                  </button>
+                )}
               </div>
  
-              {/* Main Action Button */}
-              <button
-                onClick={handleFinishActive}
-                className="mt-0.5 w-full flex items-center justify-center gap-2 glass-pill-orange font-extrabold py-3 px-5 text-xs uppercase tracking-wider cursor-pointer shrink-0"
-              >
-                <CheckCircle2 className="w-4.5 h-4.5" />
-                Finish Focus Block
-              </button>
+              {/* Main Action Buttons */}
+              <div className="grid grid-cols-2 gap-3.5 w-full mt-0.5 shrink-0">
+                <button
+                  onClick={handleLogProgressActive}
+                  className="flex items-center justify-center gap-1.5 glass-pill-white font-extrabold py-3 px-2 text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer"
+                  title="Log progress but keep this task active"
+                >
+                  <History className="w-3.5 h-3.5 text-[#B88D15]" />
+                  Log Chunk
+                </button>
+                <button
+                  onClick={handleFinishActive}
+                  className="flex items-center justify-center gap-1.5 glass-pill-orange font-extrabold py-3 px-2 text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer"
+                  title="Complete the entire task"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Finish Task
+                </button>
+              </div>
             </div>
           </div>
         ) : (
@@ -565,6 +614,73 @@ export default function DashboardClient({
           </div>
         )}
       </div>
+
+      {/* Log Chunk Confirmation Modal */}
+      {showLogChunkConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#3E2361]/25 backdrop-blur-md animate-backdrop-fade">
+          <div className="w-[min(420px,100%)] p-8 glass-tray flex flex-col items-center text-center gap-6 animate-modal-scale-up relative">
+            <div className="p-4 rounded-full bg-white/20 border border-white/45 shadow-inner backdrop-blur-md text-[#7B52AB] shrink-0">
+              <History className="w-8 h-8 text-[#B88D15]" />
+            </div>
+            
+            <div className="flex flex-col gap-2">
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">
+                Log Focus Chunk?
+              </h3>
+              <p className="text-xs text-slate-600 font-bold leading-relaxed max-w-sm">
+                This will save your current focus session of <strong className="text-[#7B52AB]">{Math.max(1, Math.round(secondsElapsed / 60))} {Math.max(1, Math.round(secondsElapsed / 60)) === 1 ? 'minute' : 'minutes'}</strong> to history, but keep this task open so you can continue it later.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 w-full mt-2">
+              <button
+                onClick={() => setShowLogChunkConfirm(false)}
+                className="flex-1 flex items-center justify-center glass-pill-white font-extrabold py-3.5 px-4 text-[10px] uppercase tracking-wider cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmLogProgressActive}
+                className="flex-1 flex items-center justify-center glass-pill-orange font-extrabold py-3.5 px-4 text-[10px] uppercase tracking-wider cursor-pointer"
+              >
+                Yes, Log Chunk
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Finish Task Success Congratulation Modal */}
+      {showFinishSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#3E2361]/25 backdrop-blur-md animate-backdrop-fade">
+          <div className="w-[min(440px,100%)] p-8 glass-tray flex flex-col items-center text-center gap-6 animate-modal-scale-up relative">
+            <div className="relative p-5 rounded-full bg-white/25 border border-white/50 shadow-inner backdrop-blur-md text-amber-500 shrink-0">
+              <div className="absolute inset-0 bg-amber-400/20 blur-xl rounded-full" />
+              <Trophy className="w-10 h-10 fill-amber-300/40 text-amber-500 relative z-10 animate-bounce" />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="font-caveat text-4xl text-[#7B52AB] animate-pulse py-0.5">
+                Incredible Job!
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">
+                Focus Block Completed
+              </h3>
+              <p className="text-xs text-slate-600 font-bold leading-relaxed max-w-sm">
+                You logged <strong className="text-[#7B52AB]">{loggedMinutes} {loggedMinutes === 1 ? 'minute' : 'minutes'}</strong> of uninterrupted flow. Celebrate your progress and take a cozy breath!
+              </p>
+            </div>
+
+            <button
+              onClick={handleExitToDashboard}
+              className="w-full flex items-center justify-center gap-2 glass-pill-orange font-extrabold py-4 px-4 text-xs uppercase tracking-wider cursor-pointer mt-2"
+            >
+              Back to Focus Dashboard
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

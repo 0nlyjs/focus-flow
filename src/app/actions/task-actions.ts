@@ -54,3 +54,43 @@ export async function createTask(prevState: any, formData: FormData) {
     return { error: "Failed to create task" };
   }
 }
+
+export async function logTaskChunk(
+  parentId: string,
+  title: string,
+  spentTime: number,
+  allocatedTime: number
+) {
+  const session = await auth();
+  if (!session || !session.user || !session.user.id) {
+    return { error: "You must be logged in to log task progress" };
+  }
+
+  try {
+    const task = await prisma.task.create({
+      data: {
+        title,
+        allocatedTime,
+        spentTime,
+        isCompleted: true,
+        userId: session.user.id,
+      },
+    });
+
+    revalidatePath("/dashboard");
+    return {
+      success: true,
+      task: {
+        id: task.id,
+        title: task.title,
+        allocatedTime: task.allocatedTime,
+        spentTime: task.spentTime,
+        isCompleted: task.isCompleted,
+        createdAt: task.createdAt.toISOString(),
+      },
+    };
+  } catch (error) {
+    console.error("Error logging task chunk:", error);
+    return { error: "Failed to log task chunk" };
+  }
+}
