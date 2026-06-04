@@ -16,6 +16,7 @@ import {
   BarChart3,
   Flame,
   RotateCcw,
+  History,
   Sparkles,
   Music,
   SkipForward,
@@ -636,30 +637,34 @@ export default function DashboardClient({
         <div
           className={`${
             isHistoryOpen
-              ? "translate-x-0 w-80 border-l lg:border border-[#7B52AB]/20 bg-[#FAF6E3]/95 lg:bg-[#7B52AB]/10 shadow-xl p-6 backdrop-blur-lg"
-              : "translate-x-full lg:translate-x-0 lg:w-0 overflow-hidden lg:border-none lg:p-0"
-          } fixed lg:relative inset-y-0 right-0 z-30 lg:z-10 h-full lg:h-auto transition-all duration-300 shrink-0 flex flex-col`}
+              ? "translate-x-0 w-80 border-l border-[#7B52AB]/20 bg-[#7B52AB]/10 shadow-2xl pt-24 pb-6 px-6 backdrop-blur-lg"
+              : "translate-x-full border-none p-0"
+          } fixed inset-y-0 right-0 z-30 h-full transition-all duration-300 shrink-0 flex flex-col`}
         >
-          {/* Toggle Button */}
+          {/* Sliding Task History Tab Button (connected with no gap) */}
           <button
             onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-            className={`
-              ${isHistoryOpen ? "right-[304px] lg:-left-3.5" : "right-4 lg:-left-3.5"}
-              fixed lg:absolute top-16 lg:top-12 p-1.5 rounded-full border border-[#B88D15]/20 bg-[#FAF6E3] hover:bg-[#FAF6E3]/80 text-slate-655 transition-all z-40 shadow-md cursor-pointer
-            `}
+            className="absolute top-1/3 left-0 -translate-x-full z-40 flex flex-col items-center gap-2 py-5 px-2.5 bg-[#7B52AB]/15 hover:bg-[#7B52AB]/25 border-y border-l border-[#7B52AB]/20 text-[#3E2361] font-extrabold rounded-l-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer select-none backdrop-blur-md"
             title={isHistoryOpen ? "Close Task History" : "Open Task History"}
           >
-            {isHistoryOpen ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            {isHistoryOpen ? (
+              <ChevronRight className="w-4 h-4 text-[#B88D15]" />
+            ) : (
+              <ChevronLeft className="w-4 h-4 text-[#B88D15] animate-pulse" />
+            )}
+            <span className="[writing-mode:vertical-lr] rotate-180 uppercase tracking-widest text-[9px] text-[#7B52AB] mt-1">
+              Task History
+            </span>
           </button>
 
           {isHistoryOpen && (
             <div className="flex flex-col h-full overflow-hidden">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200 shrink-0">
-                <h3 className="font-extrabold text-slate-800 text-sm tracking-tight flex items-center gap-2">
-                  <RotateCcw className="w-4 h-4 text-[#B88D15]" />
-                  Task History
+              <div className="flex items-center justify-between pb-4 border-b border-[#7B52AB]/20 shrink-0 mb-4">
+                <h3 className="font-black text-slate-900 text-sm tracking-tight flex items-center gap-2">
+                  <History className="w-4.5 h-4.5 text-[#B88D15]" />
+                  Focus History
                 </h3>
-                <span className="text-xs bg-[#7B52AB]/15 text-[#3E2361] font-bold px-2 py-0.5 rounded-full border border-[#7B52AB]/30">
+                <span className="text-xs bg-[#7B52AB]/15 text-[#3E2361] font-extrabold px-2.5 py-1 rounded-full border border-[#7B52AB]/30 shadow-sm">
                   {completedTasks.length} Done
                 </span>
               </div>
@@ -704,6 +709,8 @@ export default function DashboardClient({
           )}
         </div>
       </div>
+
+
 
       <div className="md:hidden border-t border-[#B88D15]/20 bg-[#FAF6E3]/40 backdrop-blur-md p-4 text-center shrink-0">
         <Link
