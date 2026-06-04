@@ -22,6 +22,7 @@ import {
   SkipBack,
 } from "lucide-react";
 import { createTask } from "@/app/actions/task-actions";
+import InteractiveParticles from "@/components/interactive-particles";
 
 interface Task {
   id: string;
@@ -336,27 +337,28 @@ export default function DashboardClient({
   const strokeDashoffset = 283 - (283 * progressPercent) / 100;
 
   return (
-    <div className="relative min-h-screen bg-[#FAF6E3] text-slate-800 font-sans flex flex-col justify-between selection:bg-[#7B52AB]/20 selection:text-[#3E2361]">
+    <div className="relative h-screen max-h-screen w-screen overflow-hidden bg-[#FAF6E3] text-slate-800 font-sans flex flex-col justify-between selection:bg-[#7B52AB]/20 selection:text-[#3E2361]">
+      <InteractiveParticles />
       {/* Background glows */}
       <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-[#EADBF7]/40 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-[#FAF6E3]/40 blur-[120px] pointer-events-none" />
 
       {/* Header */}
-      <header className="border-b border-[#B88D15]/20 bg-white/80 backdrop-blur-md sticky top-0 z-20 shadow-sm">
+      <header className="bg-[#8869AA]/85 backdrop-blur-lg sticky top-0 z-40 shadow-sm animate-navbar-wave relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link
               href="/dashboard"
-              className="font-sans font-semibold text-2xl tracking-tight text-[#7B52AB]/80 hover:text-[#7B52AB] transition-colors inline-flex items-center leading-none"
+              className="font-sans font-semibold text-2xl tracking-tight text-[#F7F1D9]/90 hover:text-[#F7F1D9] transition-colors inline-flex items-center leading-none"
             >
               FocusFlow
             </Link>
             <nav className="hidden md:flex items-center gap-1">
               <Link
                 href="/global-stats"
-                className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/50 transition-colors font-bold"
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm text-[#F7F1D9]/80 hover:text-[#F7F1D9] hover:bg-[#FAF6E3]/10 transition-colors font-bold"
               >
-                <BarChart3 className="w-4 h-4 text-[#B88D15]" />
+                <BarChart3 className="w-4 h-4 text-[#F7F1D9]" />
                 Global Stats
               </Link>
             </nav>
@@ -367,29 +369,31 @@ export default function DashboardClient({
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#B88D15]">
                 {isGuest ? "Sandbox Mode" : "Registered Member"}
               </span>
-              <span className="text-sm font-bold text-slate-700 truncate max-w-[200px]">
+              <span className="text-sm font-bold text-[#F7F1D9] truncate max-w-[200px]">
                 {user.email}
               </span>
             </div>
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm text-slate-700 font-extrabold transition-all shadow-sm"
+              className="bg-[#F7F1D9] hover:bg-[#F7F1D9]/90 text-[#3E2361] font-extrabold px-5 py-2 rounded-full text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all backdrop-blur-md flex items-center gap-2 cursor-pointer"
             >
-              <LogOut className="w-4 h-4 text-[#B88D15]" />
+              <LogOut className="w-4 h-4 text-[#3E2361]" />
               <span>Leave Session</span>
             </button>
           </div>
         </div>
+        {/* Purple stripebar */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#5C4578]" />
       </header>
 
       {/* Main Container */}
       <div className="flex-1 flex overflow-hidden max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 gap-8 relative z-10 items-stretch">
         
         {/* Main Workspace */}
-        <div className="flex-1 flex flex-col gap-8 transition-all duration-300">
+        <div className="flex-1 flex flex-col gap-8 overflow-y-auto pr-1 transition-all duration-300">
           {activeTask ? (
             /* Active Focus Timer State (Aesthetic Music Player Dial Style) */
-            <div className="flex-1 flex flex-col items-center justify-center p-8 rounded-3xl border border-[#B88D15]/20 bg-[#FFFDF5] shadow-xl relative overflow-hidden">
+            <div className="flex-1 flex flex-col items-center justify-center p-8 rounded-3xl border border-[#B88D15]/20 bg-[#FAF6E3]/40 backdrop-blur-xl shadow-xl relative overflow-hidden">
               <div className="absolute top-[-30%] left-[-20%] h-[400px] w-[400px] rounded-full bg-[#EADBF7]/50 blur-[100px]" />
               
               <div className="z-10 flex flex-col items-center gap-5 text-center max-w-lg">
@@ -439,7 +443,7 @@ export default function DashboardClient({
                 </div>
 
                 {/* Cute music Lo-fi controls bar */}
-                <div className="p-3 w-64 rounded-full bg-[#FAF6E3] border border-[#B88D15]/20 flex items-center justify-between shadow-inner">
+                <div className="p-3 w-64 rounded-full bg-[#FAF6E3]/60 backdrop-blur-md border border-[#B88D15]/20 flex items-center justify-between shadow-inner">
                   <button
                     onClick={() => {
                       if (confirm("Cancel session? Focus progress will not be saved.")) {
@@ -459,7 +463,7 @@ export default function DashboardClient({
                     {timerState === "running" ? (
                       <button
                         onClick={() => setTimerState("paused")}
-                        className="p-2.5 rounded-full bg-[#7B52AB]/50 text-white hover:bg-[#7B52AB] shadow-sm transition-all"
+                        className="p-2.5 rounded-full bg-[#7B52AB]/60 hover:bg-[#7B52AB]/80 text-white shadow-sm transition-all border border-[#7B52AB]/30"
                         title="Pause Timer"
                       >
                         <Pause className="w-5 h-5 fill-current" />
@@ -467,7 +471,7 @@ export default function DashboardClient({
                     ) : (
                       <button
                         onClick={() => setTimerState("running")}
-                        className="p-2.5 rounded-full bg-[#7B52AB] text-white hover:bg-[#663C96] shadow-sm transition-all animate-bounce"
+                        className="p-2.5 rounded-full bg-[#7B52AB]/78 hover:bg-[#7B52AB]/90 border border-[#7B52AB]/40 text-white shadow-sm transition-all animate-bounce"
                         title="Resume Timer"
                       >
                         <Play className="w-5 h-5 fill-current" />
@@ -487,7 +491,7 @@ export default function DashboardClient({
                 {/* Main Action Button */}
                 <button
                   onClick={handleFinishActive}
-                  className="mt-2 w-full flex items-center justify-center gap-2 bg-[#7B52AB] hover:bg-[#663C96] text-white font-extrabold py-3 px-6 rounded-2xl shadow-lg transition-all"
+                  className="mt-2 w-full flex items-center justify-center gap-2 bg-[#7B52AB]/78 hover:bg-[#7B52AB]/90 border border-[#7B52AB]/40 text-white font-extrabold py-3.5 px-6 rounded-2xl shadow-lg transition-all backdrop-blur-md cursor-pointer"
                 >
                   <CheckCircle2 className="w-5 h-5" />
                   Finish Focus Block
@@ -497,7 +501,7 @@ export default function DashboardClient({
           ) : (
             /* Config & Form Creation State */
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              <div className="lg:col-span-7 p-6 sm:p-8 rounded-3xl border border-[#B88D15]/20 bg-[#FFFDF5] shadow-xl flex flex-col gap-6">
+              <div className="lg:col-span-7 p-6 sm:p-8 rounded-3xl border border-[#B88D15]/20 bg-[#B88D15]/10 shadow-xl backdrop-blur-lg flex flex-col gap-6">
                 <div className="flex items-center gap-2 text-[#B88D15]">
                   <Sparkles className="w-5 h-5" />
                   <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">Create Focus Block</h2>
@@ -520,7 +524,7 @@ export default function DashboardClient({
                       id="title"
                       required
                       placeholder="e.g. Designing mockup, Writing docs..."
-                      className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7B52AB]/30 focus:border-[#7B52AB] transition-all text-sm font-bold shadow-sm"
+                      className="px-4 py-3 rounded-2xl border border-[#7B52AB]/20 bg-[#FAF6E3]/30 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7B52AB]/30 focus:border-[#7B52AB] transition-all text-sm font-bold shadow-sm"
                     />
                   </div>
 
@@ -534,7 +538,7 @@ export default function DashboardClient({
                           id="timeMode"
                           value={timeMode}
                           onChange={(e) => setTimeMode(e.target.value as "countdown" | "countup")}
-                          className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#7B52AB]/30 focus:border-[#7B52AB] transition-all text-sm font-bold appearance-none cursor-pointer shadow-sm"
+                          className="w-full px-4 py-3 rounded-2xl border border-[#7B52AB]/20 bg-[#FAF6E3]/30 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#7B52AB]/30 focus:border-[#7B52AB] transition-all text-sm font-bold appearance-none cursor-pointer shadow-sm"
                         >
                           <option value="countdown">Countdown Mode</option>
                           <option value="countup">Count Up Mode</option>
@@ -556,7 +560,7 @@ export default function DashboardClient({
                         max="180"
                         defaultValue="25"
                         disabled={timeMode === "countup"}
-                        className="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#7B52AB]/30 focus:border-[#7B52AB] transition-all text-sm font-bold shadow-sm"
+                        className="px-4 py-3 rounded-2xl border border-[#7B52AB]/20 bg-[#FAF6E3]/30 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#7B52AB]/30 focus:border-[#7B52AB] transition-all text-sm font-bold shadow-sm"
                       />
                     </div>
                   </div>
@@ -564,7 +568,7 @@ export default function DashboardClient({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full flex items-center justify-center gap-2 bg-[#7B52AB] hover:bg-[#663C96] text-white font-extrabold py-3 px-4 rounded-2xl shadow-lg transition-all disabled:opacity-70 group text-sm uppercase tracking-wider"
+                    className="w-full flex items-center justify-center gap-2 bg-[#7B52AB]/78 hover:bg-[#7B52AB]/90 border border-[#7B52AB]/40 text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-lg transition-all backdrop-blur-md disabled:opacity-70 group text-sm uppercase tracking-wider cursor-pointer"
                   >
                     {isSubmitting ? "Creating..." : "Start Focus Session"}
                     <Play className="w-4 h-4 fill-white transition-transform group-hover:scale-105" />
@@ -580,7 +584,7 @@ export default function DashboardClient({
 
                 <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
                   {activeTasks.length === 0 ? (
-                    <div className="p-6 rounded-3xl border border-[#B88D15]/20 bg-[#FFFDF5] text-center shadow-md flex flex-col items-center gap-3">
+                    <div className="p-6 rounded-3xl border border-[#B88D15]/20 bg-[#B88D15]/10 backdrop-blur-lg text-center shadow-md flex flex-col items-center gap-3">
                       <Image
                         src="/cat_sleeping.png"
                         alt="Cute grey cat sleeping curled up next to yarn"
@@ -596,7 +600,7 @@ export default function DashboardClient({
                     activeTasks.map((t) => (
                       <div
                         key={t.id}
-                        className="p-4 rounded-2xl border border-[#B88D15]/20 bg-[#FFFDF5] hover:border-[#7B52AB]/50 transition-all flex items-center justify-between gap-4 group shadow-sm hover:shadow"
+                        className="p-4 rounded-2xl border border-[#B88D15]/20 bg-[#FAF6E3]/40 backdrop-blur-md hover:bg-[#FAF6E3]/60 hover:border-[#7B52AB]/50 transition-all flex items-center justify-between gap-4 group shadow-sm hover:shadow"
                       >
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-slate-800 text-sm truncate">{t.title}</p>
@@ -607,14 +611,14 @@ export default function DashboardClient({
                         <div className="flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => startFocus(t)}
-                            className="p-2 rounded-lg bg-[#EADBF7]/50 text-[#7B52AB] hover:bg-[#7B52AB] hover:text-white transition-all shadow-sm border border-[#EADBF7]"
+                            className="p-2 rounded-lg bg-[#7B52AB]/15 text-[#3E2361] hover:bg-[#7B52AB] hover:text-white transition-all shadow-sm border border-[#7B52AB]/30 cursor-pointer"
                             title="Start Focus"
                           >
                             <Play className="w-4 h-4 fill-current" />
                           </button>
                           <button
                             onClick={() => handleDeleteTask(t.id)}
-                            className="p-2 rounded-lg bg-[#FAF6E3] text-slate-500 hover:bg-rose-50 hover:text-rose-650 transition-all shadow-sm border border-[#B88D15]/20"
+                            className="p-2 rounded-lg bg-[#FAF6E3]/60 text-slate-500 hover:bg-rose-500/10 hover:text-rose-600 transition-all shadow-sm border border-[#B88D15]/20 cursor-pointer"
                             title="Delete Task"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -628,19 +632,21 @@ export default function DashboardClient({
             </div>
           )}
         </div>
-
         {/* Sidebar History Drawer (Cozy Card Design) */}
         <div
           className={`${
             isHistoryOpen
-              ? "w-80 border border-[#B88D15]/20 bg-[#FFFDF5] shadow-xl rounded-3xl p-6"
-              : "w-0 overflow-hidden"
-          } transition-all duration-300 shrink-0 flex flex-col relative`}
+              ? "translate-x-0 w-80 border-l lg:border border-[#7B52AB]/20 bg-[#FAF6E3]/95 lg:bg-[#7B52AB]/10 shadow-xl p-6 backdrop-blur-lg"
+              : "translate-x-full lg:translate-x-0 lg:w-0 overflow-hidden lg:border-none lg:p-0"
+          } fixed lg:relative inset-y-0 right-0 z-30 lg:z-10 h-full lg:h-auto transition-all duration-300 shrink-0 flex flex-col`}
         >
           {/* Toggle Button */}
           <button
             onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-            className="absolute top-12 -left-3.5 p-1.5 rounded-full border border-[#B88D15]/20 bg-[#FAF6E3] hover:bg-[#FAF6E3]/80 text-slate-650 transition-all z-10 shadow-md"
+            className={`
+              ${isHistoryOpen ? "right-[304px] lg:-left-3.5" : "right-4 lg:-left-3.5"}
+              fixed lg:absolute top-16 lg:top-12 p-1.5 rounded-full border border-[#B88D15]/20 bg-[#FAF6E3] hover:bg-[#FAF6E3]/80 text-slate-655 transition-all z-40 shadow-md cursor-pointer
+            `}
             title={isHistoryOpen ? "Close Task History" : "Open Task History"}
           >
             {isHistoryOpen ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -653,7 +659,7 @@ export default function DashboardClient({
                   <RotateCcw className="w-4 h-4 text-[#B88D15]" />
                   Task History
                 </h3>
-                <span className="text-xs bg-[#EADBF7]/50 text-[#7B52AB] font-bold px-2 py-0.5 rounded-full border border-[#EADBF7]">
+                <span className="text-xs bg-[#7B52AB]/15 text-[#3E2361] font-bold px-2 py-0.5 rounded-full border border-[#7B52AB]/30">
                   {completedTasks.length} Done
                 </span>
               </div>
@@ -668,7 +674,7 @@ export default function DashboardClient({
                   completedTasks.map((t) => (
                     <div
                       key={t.id}
-                      className="p-4 rounded-2xl border border-[#B88D15]/20 bg-[#FFFDF5] hover:border-[#7B52AB]/35 transition-all flex items-start justify-between gap-3 group shadow-sm"
+                      className="p-4 rounded-2xl border border-[#B88D15]/20 bg-[#FAF6E3]/40 backdrop-blur-md hover:bg-[#FAF6E3]/60 hover:border-[#7B52AB]/35 transition-all flex items-start justify-between gap-3 group shadow-sm"
                     >
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-slate-600 text-sm line-through decoration-slate-350 truncate">
@@ -685,7 +691,7 @@ export default function DashboardClient({
                       </div>
                       <button
                         onClick={() => handleDeleteTask(t.id)}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-650 cursor-pointer transition-all"
                         title="Delete permanently"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -699,7 +705,7 @@ export default function DashboardClient({
         </div>
       </div>
 
-      <div className="md:hidden border-t border-[#B88D15]/20 bg-white p-4 text-center shrink-0">
+      <div className="md:hidden border-t border-[#B88D15]/20 bg-[#FAF6E3]/40 backdrop-blur-md p-4 text-center shrink-0">
         <Link
           href="/global-stats"
           className="inline-flex items-center gap-2 text-sm text-[#B88D15] font-bold"
@@ -710,7 +716,7 @@ export default function DashboardClient({
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-[#B88D15]/20 py-4 text-center text-xs text-slate-500 shrink-0 bg-white/20">
+      <footer className="border-t border-[#B88D15]/20 py-4 text-center text-xs text-slate-500 shrink-0 bg-[#FAF6E3]/20">
         <p>© {new Date().getFullYear()} FocusFlow. Productivity Study Corner.</p>
       </footer>
     </div>
