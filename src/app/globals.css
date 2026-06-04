@@ -343,13 +343,13 @@ body {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 100%) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
-  border-top: 1.5px solid rgba(255, 255, 255, 0.9) !important;
-  border-left: 1.5px solid rgba(255, 255, 255, 0.75) !important;
-  border-right: 1.2px solid rgba(255, 255, 255, 0.3) !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  border-right: 1.2px solid rgba(255, 255, 255, 0.2) !important;
   border-bottom: 1.5px solid rgba(123, 82, 171, 0.15) !important;
   box-shadow: 
     0 8px 20px -6px rgba(123, 82, 171, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
   border-radius: 9999px !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -358,52 +358,52 @@ body {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.35) 100%) !important;
   box-shadow: 
     0 12px 24px -4px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
 }
 
 .glass-pill-white:focus-within,
 .glass-pill-white:focus {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%) !important;
-  border-top-color: rgba(255, 255, 255, 0.95) !important;
-  border-left-color: rgba(255, 255, 255, 0.8) !important;
+  border-top-color: rgba(255, 255, 255, 0.6) !important;
+  border-left-color: rgba(255, 255, 255, 0.5) !important;
   box-shadow: 
     0 12px 28px -4px rgba(123, 82, 171, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
   outline: none !important;
 }
 
 .glass-pill-orange {
-  background: linear-gradient(135deg, #EAA86C 0%, #D87B37 100%) !important;
+  background: linear-gradient(135deg, rgba(240, 184, 137, 0.7) 0%, rgba(232, 133, 74, 0.65) 20%) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
-  border-top: 1.5px solid rgba(255, 255, 255, 0.9) !important;
-  border-left: 1.5px solid rgba(255, 255, 255, 0.65) !important;
-  border-right: 1px solid rgba(216, 123, 55, 0.2) !important;
-  border-bottom: 1.5px solid rgba(180, 85, 30, 0.25) !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+  border-right: 1px solid rgba(221, 138, 85, 0.15) !important;
+  border-bottom: 1.5px solid rgba(207, 116, 63, 0.2) !important;
   box-shadow: 
-    0 16px 40px -4px rgba(216, 123, 55, 0.15),
-    0 6px 20px -2px rgba(216, 123, 55, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+    0 12px 32px -8px rgba(221, 138, 85, 0.12),
+    0 4px 12px -2px rgba(221, 138, 85, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
   border-radius: 9999px !important;
   color: #3e2361 !important; /* Rich brand purple contrast */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  text-shadow: 0 0.5px 1px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 0.5px 1px rgba(255, 255, 255, 0.3);
 }
 
 .glass-pill-orange:hover:not(:disabled) {
-  background: linear-gradient(135deg, #F4B37C 0%, #E27E36 100%) !important;
+  background: linear-gradient(135deg, rgba(241, 191, 147, 0.8) 0%, rgba(236, 145, 85, 0.75) 20%) !important;
   box-shadow: 
-    0 20px 48px -4px rgba(216, 123, 55, 0.20),
-    0 8px 24px -2px rgba(216, 123, 55, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+    0 16px 36px -4px rgba(221, 138, 85, 0.16),
+    0 6px 16px -2px rgba(221, 138, 85, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
   transform: translateY(-1px) scale(1.015);
 }
 
 .glass-pill-orange:active:not(:disabled) {
   transform: translateY(1px) scale(0.985);
   box-shadow: 
-    0 6px 16px -4px rgba(216, 123, 55, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+    0 6px 16px -4px rgba(221, 138, 85, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
 }
 
 /* Glass-style Option inputs */
@@ -522,6 +522,13 @@ select.glass-pill-white option {
     0 16px 28px -4px rgba(249, 115, 22, 0.35),
     0 6px 12px -2px rgba(249, 115, 22, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+[data-theme="dark"] .glass-pill-orange:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 
+    0 6px 16px -4px rgba(216, 123, 55, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
 /* Hide scrollbar globally but keep scroll functionality */
