@@ -167,15 +167,17 @@ export default function Home() {
           {/* Ambient Glow */}
           <div className="absolute -inset-4 bg-gradient-to-tr from-[#B88D15]/25 to-[#7B52AB]/30 rounded-[3rem] blur-3xl opacity-75 group-hover:opacity-95 transition-opacity duration-500 -z-10" />
 
-          <div className={`lp-image-frame p-3 rounded-[2.5rem] border border-[#B88D15]/20 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full max-w-lg flex flex-col justify-center items-center relative animate-float transition-all duration-500 hover:shadow-[0_20px_50px_rgba(184,141,21,0.3)] ${isDark ? "" : "bg-[#FAF6E3]/40"}`}>
-            <div className="w-full h-full relative overflow-hidden rounded-[1.8rem] shadow-inner">
-              <Image
-                src="/hero_girl.png"
-                alt="Define your focus illustration"
-                fill
-                className="object-cover transform group-hover:scale-105 transition-transform duration-700"
-                priority
-              />
+          <div className="animate-float w-full max-w-lg">
+            <div className={`lp-image-frame p-3 rounded-[2.5rem] border border-[#B88D15]/20 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full flex flex-col justify-center items-center relative transition-all duration-500 hover:shadow-[0_20px_50px_rgba(184,141,21,0.3)] ${isDark ? "" : "bg-[#FAF6E3]/40"}`}>
+              <div className="w-full h-full relative overflow-hidden rounded-[1.8rem] shadow-inner">
+                <Image
+                  src="/hero_girl.png"
+                  alt="Define your focus illustration"
+                  fill
+                  className="object-cover transform group-hover:scale-105 transition-transform duration-700"
+                  priority
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -234,7 +236,8 @@ export default function Home() {
             {/* Ambient Glow */}
             <div className="absolute -inset-4 bg-gradient-to-tr from-[#7B52AB]/25 to-[#B88D15]/30 rounded-[3rem] blur-3xl opacity-75 group-hover:opacity-95 transition-opacity duration-500 -z-10" />
 
-            <div className={`lp-image-frame p-3 rounded-[2.5rem] border border-[#B88D15]/20 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full max-w-md flex flex-col justify-center items-center relative animate-float-delayed transition-all duration-500 hover:shadow-[0_20px_50px_rgba(123,82,171,0.3)] ${isDark ? "" : "bg-[#FAF6E3]/40"}`}>
+          <div className="animate-float-delayed w-full max-w-md">
+            <div className={`lp-image-frame p-3 rounded-[2.5rem] border border-[#B88D15]/20 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full flex flex-col justify-center items-center relative transition-all duration-500 hover:shadow-[0_20px_50px_rgba(123,82,171,0.3)] ${isDark ? "" : "bg-[#FAF6E3]/40"}`}>
               <div className="w-full h-full relative overflow-hidden rounded-[1.8rem] shadow-inner">
                 <Image
                   src="/cat_playing.png"
@@ -245,6 +248,7 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
 
           {/* Right Column (Text) */}
           <div className="flex flex-col gap-5 text-left order-1 lg:order-2">
@@ -297,7 +301,8 @@ export default function Home() {
             {/* Ambient Glow */}
             <div className="absolute -inset-4 bg-gradient-to-tr from-[#B88D15]/25 to-[#7B52AB]/30 rounded-[3rem] blur-3xl opacity-75 group-hover:opacity-95 transition-opacity duration-500 -z-10" />
 
-            <div className={`lp-image-frame p-3 rounded-[2.5rem] border border-[#B88D15]/20 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full max-w-md flex flex-col justify-center items-center relative animate-float transition-all duration-500 hover:shadow-[0_20px_50px_rgba(184,141,21,0.3)] ${isDark ? "" : "bg-[#FAF6E3]/40"}`}>
+          <div className="animate-float w-full max-w-md">
+            <div className={`lp-image-frame p-3 rounded-[2.5rem] border border-[#B88D15]/20 shadow-2xl backdrop-blur-xl aspect-[4/3] w-full flex flex-col justify-center items-center relative transition-all duration-500 hover:shadow-[0_20px_50px_rgba(184,141,21,0.3)] ${isDark ? "" : "bg-[#FAF6E3]/40"}`}>
               <div className="w-full h-full relative overflow-hidden rounded-[1.8rem] shadow-inner">
                 <Image
                   src="/sitting_cat.png"
@@ -309,7 +314,8 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* Testimonials Section */}
       <section className={`lp-section-alt py-20 border-y ${isDark ? "bg-[rgba(22,13,38,0.7)] border-[rgba(123,82,171,0.18)]" : "bg-[#B88D15]/5 border-slate-200/40"}`}>
