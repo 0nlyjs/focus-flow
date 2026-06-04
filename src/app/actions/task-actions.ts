@@ -94,3 +94,58 @@ export async function logTaskInterval(
     return { error: "Failed to log task interval" };
   }
 }
+
+export async function syncGuestTasks(
+  guestTasks: {
+    id: string;
+    title: string;
+    allocatedTime: number;
+    spentTime: number;
+    isCompleted: boolean;
+    createdAt: string;
+  }[]
+) {
+  const session = await auth();
+  if (!session || !session.user || !session.user.id) {
+    return { error: "You must be logged in to sync tasks" };
+  }
+
+  const userId = session.user.id as string;
+
+  try {
+    const createdTasks = await prisma.$transaction(
+      guestTasks.map((t) =>
+        prisma.task.create({
+          data: {
+            id: t.id,
+            title: t.title,
+            allocatedTime: t.allocatedTime,
+            spentTime: t.spentTime,
+            isCompleted: t.isCompleted,
+            userId: userId,
+            createdAt: new Date(t.createdAt),
+          },
+        })
+      )
+    );
+
+    revalidatePath("/dashboard");
+    revalidatePath("/analytics");
+    revalidatePath("/reminders");
+    return {
+      success: true,
+      tasks: createdTasks.map((t) => ({
+        id: t.id,
+        title: t.title,
+        allocatedTime: t.allocatedTime,
+        spentTime: t.spentTime,
+        isCompleted: t.isCompleted,
+        createdAt: t.createdAt.toISOString(),
+      })),
+    };
+  } catch (error) {
+    console.error("Error syncing guest tasks:", error);
+    return { error: "Failed to sync guest tasks" };
+  }
+}
+

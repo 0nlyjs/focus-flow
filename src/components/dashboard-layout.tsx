@@ -20,6 +20,8 @@ import {
   Moon
 } from "lucide-react";
 
+import { syncGuestTasks } from "@/app/actions/task-actions";
+
 interface Task {
   id: string;
   title: string;
@@ -56,6 +58,34 @@ export default function DashboardLayout({
   const [isDark, setIsDark] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Synchronize guest tasks to database if user is logged in
+  useEffect(() => {
+    if (!isGuest) {
+      const stored = localStorage.getItem("focusflow_guest_tasks");
+      if (stored) {
+        try {
+          const guestTasks = JSON.parse(stored);
+          if (Array.isArray(guestTasks) && guestTasks.length > 0) {
+            const performSync = async () => {
+              const res = await syncGuestTasks(guestTasks);
+              if (res.success) {
+                localStorage.removeItem("focusflow_guest_tasks");
+                router.refresh();
+              } else if (res.error) {
+                console.error("Failed to sync guest tasks:", res.error);
+              }
+            };
+            performSync();
+          } else {
+            localStorage.removeItem("focusflow_guest_tasks");
+          }
+        } catch (e) {
+          console.error("Error parsing guest tasks for sync:", e);
+        }
+      }
+    }
+  }, [isGuest, router]);
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");

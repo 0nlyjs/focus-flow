@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { BarChart3, Clock, Trophy, Users, Star, History } from "lucide-react";
+import { BarChart3, Clock, Trophy, Users, Star, History, AlertTriangle } from "lucide-react";
 import DashboardLayout from "@/components/dashboard-layout";
 
 interface Task {
@@ -41,6 +41,10 @@ export default function AnalyticsClient({
       setTasks(initialTasks);
     }
   }, [initialTasks, isGuest]);
+
+  // Compute user's personal analytics dynamically from tasks state
+  const userCompletedTasksCount = tasks.filter((t) => t.isCompleted).length;
+  const userTotalSpentMinutes = tasks.filter((t) => t.isCompleted).reduce((sum, t) => sum + t.spentTime, 0);
 
   // Guest Mode: Load tasks from localStorage on client mount
   useEffect(() => {
@@ -153,22 +157,44 @@ export default function AnalyticsClient({
       <div className="flex-1 flex justify-center overflow-y-auto w-full transition-all duration-300">
         <div className="w-full max-w-3xl flex flex-col gap-8 px-2 py-4">
           
-          {/* Main Banner Heading */}
-          <div className="flex flex-col gap-2 text-left">
-            <div className="font-caveat text-4xl text-[#7B52AB] animate-pulse py-0.5">
-              Focuser Analytics
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-white/20 dark:bg-[#7B52AB]/15 rounded-xl border border-[#7B52AB]/20 text-[#7B52AB]">
-                <BarChart3 className="w-5 h-5" />
+          {/* Header Row */}
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 w-full">
+            {/* Main Banner Heading */}
+            <div className="flex flex-col gap-2 text-left">
+              <div className="font-caveat text-4xl text-[#7B52AB] animate-pulse py-0.5">
+                Focuser Analytics
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 leading-tight">
-                Analytics
-              </h1>
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-white/20 dark:bg-[#7B52AB]/15 rounded-xl border border-[#7B52AB]/20 text-[#7B52AB]">
+                  <BarChart3 className="w-5 h-5" />
+                </div>
+                <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 leading-tight">
+                  Analytics
+                </h1>
+              </div>
+              <p className="text-xs text-slate-500 font-bold max-w-xl leading-relaxed">
+                Analyze your personal focus sessions, intervals logged, and productivity trends.
+              </p>
             </div>
-            <p className="text-xs text-slate-500 font-bold max-w-xl leading-relaxed">
-              Aggregated stats of focus, grit, and productivity achieved by creators around the world. Updates live.
-            </p>
+
+            {/* Guest Warning Card */}
+            {isGuest && (
+              <div className="glass-tray border-amber-500/30 bg-amber-500/5 p-5 flex flex-col gap-2.5 max-w-sm w-full md:w-auto shadow-md">
+                <div className="flex items-center gap-2 text-amber-550 dark:text-amber-400">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Unsaved Session</span>
+                </div>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 font-bold leading-normal">
+                  You are playing as a Guest. Your focus logs are saved only on this device. Sign in to back up your data so it is never lost.
+                </p>
+                <button
+                  onClick={() => window.location.href = "/?login=true"}
+                  className="mt-1 w-full flex items-center justify-center gap-1.5 glass-pill-orange text-[10px] font-extrabold uppercase tracking-wider py-2 px-4 cursor-pointer animate-pulse"
+                >
+                  Sign In / Register
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Stats Grid */}
@@ -180,7 +206,7 @@ export default function AnalyticsClient({
               </div>
               <p className="text-[10px] font-extrabold text-[#7B52AB] uppercase tracking-wider mb-2">Total Focus Time</p>
               <h2 className="text-3xl font-black text-slate-900 tracking-tight font-mono mb-2">
-                {metrics.totalSpentMinutes.toLocaleString()}m
+                {userTotalSpentMinutes.toLocaleString()}m
               </h2>
               <p className="text-[10px] text-slate-500 font-bold">Total minutes spent completing tasks.</p>
             </div>
@@ -192,7 +218,7 @@ export default function AnalyticsClient({
               </div>
               <p className="text-[10px] font-extrabold text-[#7B52AB] uppercase tracking-wider mb-2">Tasks Completed</p>
               <h2 className="text-3xl font-black text-slate-900 tracking-tight font-mono mb-2">
-                {metrics.completedTasksCount.toLocaleString()}
+                {userCompletedTasksCount.toLocaleString()}
               </h2>
               <p className="text-[10px] text-slate-500 font-bold">Fully resolved focus blocks logged.</p>
             </div>
