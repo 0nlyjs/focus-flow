@@ -526,7 +526,7 @@ export default function DashboardClient({
           <div className="w-[min(640px,100%,calc(100vh-180px))] aspect-square mx-auto my-auto self-center flex flex-col items-center justify-center p-6 sm:p-8 glass-tray relative overflow-hidden shrink-0">
             <div className="z-10 flex flex-col items-center gap-4 sm:gap-5 text-center max-w-lg w-full">
               {/* Handwritten Cozy Encouragement Text */}
-              <div className="font-caveat text-4xl text-[#7B52AB] animate-pulse py-0.5">
+              <div className="font-caveat text-4xl text-[#7B52AB] py-0.5">
                 {currentQuote}
               </div>
 
@@ -534,14 +534,10 @@ export default function DashboardClient({
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
                   {activeTask.title}
                 </h2>
-                <p className="text-[11px] text-slate-500 font-bold leading-relaxed max-w-sm mx-auto">
-                  Cozy session in progress. Quiet the noise, take slow breaths,
-                  and sink into your flow.
-                </p>
               </div>
 
               {/* Animated Clock Circle Dial */}
-              <div className="relative w-48 h-48 flex items-center justify-center bg-white/20 rounded-full border border-white/40 shadow-inner backdrop-blur-md shrink-0">
+              <div className="relative w-[230px] h-[230px] flex items-center justify-center bg-white/20 rounded-full border border-white/40 shadow-inner backdrop-blur-md shrink-0">
                 <svg
                   className="absolute w-full h-full -rotate-90"
                   viewBox="0 0 192 192"
@@ -567,10 +563,10 @@ export default function DashboardClient({
 
                 {/* Digital Clock reading */}
                 <div className="flex flex-col items-center z-10">
-                  <span className="text-4xl font-black tracking-tight text-slate-900 font-mono">
+                  <span className="text-5xl font-black tracking-tight text-slate-900 font-mono">
                     {formatTime(displayTime)}
                   </span>
-                  <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">
                     Elapsed: {formatTime(secondsElapsed)}
                   </span>
                 </div>
