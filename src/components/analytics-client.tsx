@@ -70,6 +70,8 @@ export default function AnalyticsClient({
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [timeframe, setTimeframe] = useState<string>("week");
   const [isTimeframeOpen, setIsTimeframeOpen] = useState(false);
+  const [isDeletingTaskId, setIsDeletingTaskId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(!isGuest);
   const timeframeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -90,9 +92,24 @@ export default function AnalyticsClient({
   // Sync tasks when initialTasks changes (only for authenticated users)
   useEffect(() => {
     if (!isGuest) {
-      setTasks(initialTasks);
+      async function fetchTasks() {
+        try {
+          const res = await fetch("/api/tasks");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.tasks) {
+              setTasks(data.tasks);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch analytics tasks:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      fetchTasks();
     }
-  }, [initialTasks, isGuest]);
+  }, [isGuest]);
 
   // Filter tasks based on selected timeframe
   const filteredTasks = useMemo(() => {
@@ -209,6 +226,8 @@ export default function AnalyticsClient({
       tasks={tasks}
       isGuest={isGuest}
       onDeleteTask={handleDeleteTask}
+      isDeletingTaskId={isDeletingTaskId}
+      isLoading={isLoading}
     >
       {/* Centered Main Workspace Container */}
       <div className="flex-1 flex justify-center overflow-y-auto w-full transition-all duration-300 py-6 sm:py-8">
@@ -317,34 +336,58 @@ export default function AnalyticsClient({
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-            {/* Card 1: Total Minutes */}
-            <div className="glass-tray relative p-6 group overflow-hidden shadow-md">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Clock className="w-20 h-20 text-[#7B52AB]" />
-              </div>
-              <p className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-2">Total Focus Time</p>
-              <h2 className="text-3xl font-black text-slate-900 tracking-tight font-mono mb-2">
-                {userTotalSpentMinutes.toLocaleString()}m
-              </h2>
-              <p className="text-[10px] text-slate-500 font-bold">Total minutes spent completing tasks.</p>
+          {isLoading ? (
+            /* Pulsing Stats Skeleton Grid */
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full animate-pulse">
+              {[1, 2].map((i) => (
+                <div key={i} className="glass-tray h-32 p-6 flex flex-col justify-between">
+                  <div className="h-3 w-24 bg-slate-400/25 dark:bg-slate-700/50 rounded" />
+                  <div className="h-8 w-28 bg-slate-400/20 dark:bg-slate-700/40 rounded" />
+                  <div className="h-3 w-40 bg-slate-400/15 dark:bg-slate-700/30 rounded" />
+                </div>
+              ))}
             </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full animate-slide-fade-in">
+              {/* Card 1: Total Minutes */}
+              <div className="glass-tray relative p-6 group overflow-hidden shadow-md">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Clock className="w-20 h-20 text-[#7B52AB]" />
+                </div>
+                <p className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-2">Total Focus Time</p>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight font-mono mb-2">
+                  {userTotalSpentMinutes.toLocaleString()}m
+                </h2>
+                <p className="text-[10px] text-slate-500 font-bold">Total minutes spent completing tasks.</p>
+              </div>
 
-            {/* Card 2: Completed Tasks */}
-            <div className="glass-tray relative p-6 group overflow-hidden shadow-md">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Trophy className="w-20 h-20 text-[#7B52AB]" />
+              {/* Card 2: Completed Tasks */}
+              <div className="glass-tray relative p-6 group overflow-hidden shadow-md">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Trophy className="w-20 h-20 text-[#7B52AB]" />
+                </div>
+                <p className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-2">Tasks Completed</p>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight font-mono mb-2">
+                  {userCompletedTasksCount.toLocaleString()}
+                </h2>
+                <p className="text-[10px] text-slate-500 font-bold">Fully resolved focus blocks logged.</p>
               </div>
-              <p className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-2">Tasks Completed</p>
-              <h2 className="text-3xl font-black text-slate-900 tracking-tight font-mono mb-2">
-                {userCompletedTasksCount.toLocaleString()}
-              </h2>
-              <p className="text-[10px] text-slate-500 font-bold">Fully resolved focus blocks logged.</p>
             </div>
-          </div>
+          )}
 
           {/* Your Focus Style Analytics */}
-          <div className="w-full p-6 sm:p-8 glass-tray flex flex-col gap-6 text-left shrink-0 shadow-md">
+          {isLoading ? (
+            /* Focus style rhythm card skeleton */
+            <div className="glass-tray p-6 sm:p-8 flex flex-col gap-6 animate-pulse w-full">
+              <div className="h-5 w-40 bg-slate-400/25 dark:bg-slate-700/50 rounded" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-20 bg-white/20 dark:bg-white/5 border border-white/20 dark:border-white/5 rounded-2xl" />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="w-full p-6 sm:p-8 glass-tray flex flex-col gap-6 text-left shrink-0 shadow-md animate-slide-fade-in">
             <div className="flex items-center gap-2.5 text-slate-700">
               <History className="w-5 h-5" />
               <h2 className="text-lg font-extrabold text-slate-800 tracking-tight">Your Focus Rhythm</h2>
@@ -396,6 +439,7 @@ export default function AnalyticsClient({
               </div>
             )}
           </div>
+          )}
           {/* Explicit spacer to prevent clipping/margin collapsing on scroll container's last child */}
           <div className="h-8 shrink-0" />
         </div>

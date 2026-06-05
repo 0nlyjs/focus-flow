@@ -46,11 +46,46 @@ interface AdminClientProps {
 
 export default function AdminClient({
   user,
-  tasks,
-  metrics,
-  usersList = [],
+  tasks: initialTasks,
+  metrics: initialMetrics,
+  usersList: initialUsersList = [],
 }: AdminClientProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [metrics, setMetrics] = useState(initialMetrics);
+  const [usersList, setUsersList] = useState<UserItem[]>(initialUsersList);
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    async function loadAdminData() {
+      try {
+        const [tasksRes, adminRes] = await Promise.all([
+          fetch("/api/tasks"),
+          fetch("/api/admin"),
+        ]);
+        
+        if (tasksRes.ok) {
+          const tasksData = await tasksRes.json();
+          if (tasksData.success && tasksData.tasks) {
+            setTasks(tasksData.tasks);
+          }
+        }
+        
+        if (adminRes.ok) {
+          const adminData = await adminRes.json();
+          if (adminData.success) {
+            setMetrics(adminData.metrics);
+            setUsersList(adminData.usersList);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load admin data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadAdminData();
+  }, []);
 
   const filteredUsers = usersList.filter((u) => {
     const nameMatch = u.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
@@ -79,7 +114,7 @@ export default function AdminClient({
   };
 
   return (
-    <DashboardLayout user={user} tasks={tasks}>
+    <DashboardLayout user={user} tasks={tasks} isLoading={isLoading}>
       <div className="flex-1 flex justify-center overflow-y-auto w-full transition-all duration-300 py-6 sm:py-8">
         <div className="w-full max-w-4xl flex flex-col gap-8 px-4 py-4">
           
@@ -109,55 +144,68 @@ export default function AdminClient({
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-            {/* Stat: Total Users */}
-            <div className="glass-tray relative p-5 group overflow-hidden shadow-md">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Users className="w-16 h-16 text-[#7B52AB]" />
-              </div>
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Total Focusers</span>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight font-mono">
-                {metrics.totalUsers.toLocaleString()}
-              </h2>
-              <p className="text-[10px] text-slate-500 font-bold mt-1">Registered email accounts.</p>
+          {isLoading ? (
+            /* Pulsing Admin Stats Skeleton Grid */
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full animate-pulse">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="glass-tray h-28 p-5 flex flex-col justify-between">
+                  <div className="h-2.5 w-20 bg-slate-400/25 dark:bg-slate-700/50 rounded" />
+                  <div className="h-7 w-20 bg-slate-400/20 dark:bg-slate-700/40 rounded" />
+                  <div className="h-2.5 w-24 bg-slate-400/15 dark:bg-slate-700/30 rounded" />
+                </div>
+              ))}
             </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full animate-slide-fade-in">
+              {/* Stat: Total Users */}
+              <div className="glass-tray relative p-5 group overflow-hidden shadow-md">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Users className="w-16 h-16 text-[#7B52AB]" />
+                </div>
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Total Focusers</span>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight font-mono">
+                  {metrics.totalUsers.toLocaleString()}
+                </h2>
+                <p className="text-[10px] text-slate-500 font-bold mt-1">Registered email accounts.</p>
+              </div>
 
-            {/* Stat: Total Tasks Logged */}
-            <div className="glass-tray relative p-5 group overflow-hidden shadow-md">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <FileText className="w-16 h-16 text-[#7B52AB]" />
+              {/* Stat: Total Tasks Logged */}
+              <div className="glass-tray relative p-5 group overflow-hidden shadow-md">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <FileText className="w-16 h-16 text-[#7B52AB]" />
+                </div>
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Tasks Created</span>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight font-mono">
+                  {metrics.totalTasks.toLocaleString()}
+                </h2>
+                <p className="text-[10px] text-slate-500 font-bold mt-1">Total focus sessions logged.</p>
               </div>
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Tasks Created</span>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight font-mono">
-                {metrics.totalTasks.toLocaleString()}
-              </h2>
-              <p className="text-[10px] text-slate-500 font-bold mt-1">Total focus sessions logged.</p>
-            </div>
 
-            {/* Stat: Completed Tasks */}
-            <div className="glass-tray relative p-5 group overflow-hidden shadow-md">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <CheckCircle2 className="w-16 h-16 text-[#7B52AB]" />
+              {/* Stat: Completed Tasks */}
+              <div className="glass-tray relative p-5 group overflow-hidden shadow-md">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <CheckCircle2 className="w-16 h-16 text-[#7B52AB]" />
+                </div>
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Tasks Completed</span>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight font-mono">
+                  {metrics.totalCompletedTasks.toLocaleString()}
+                </h2>
+                <p className="text-[10px] text-slate-500 font-bold mt-1">Fully finished focus intervals.</p>
               </div>
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Tasks Completed</span>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight font-mono">
-                {metrics.totalCompletedTasks.toLocaleString()}
-              </h2>
-              <p className="text-[10px] text-slate-500 font-bold mt-1">Fully finished focus intervals.</p>
-            </div>
 
-            {/* Stat: Global Focus Time */}
-            <div className="glass-tray relative p-5 group overflow-hidden shadow-md">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Clock className="w-16 h-16 text-[#7B52AB]" />
+              {/* Stat: Global Focus Time */}
+              <div className="glass-tray relative p-5 group overflow-hidden shadow-md">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Clock className="w-16 h-16 text-[#7B52AB]" />
+                </div>
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Global Focus Time</span>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight font-mono">
+                  {formatHours(metrics.totalSpentMinutes)}
+                </h2>
+                <p className="text-[10px] text-slate-500 font-bold mt-1">Total focus hours logged.</p>
               </div>
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-1">Global Focus Time</span>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight font-mono">
-                {formatHours(metrics.totalSpentMinutes)}
-              </h2>
-              <p className="text-[10px] text-slate-500 font-bold mt-1">Total focus hours logged.</p>
             </div>
-          </div>
+          )}
 
           {/* User Directory Control Header */}
           <div className="glass-tray p-6 flex flex-col gap-6 shadow-md">
@@ -182,12 +230,20 @@ export default function AdminClient({
 
             {/* User List Directory */}
             <div className="space-y-4">
-              {filteredUsers.length === 0 ? (
+              {isLoading ? (
+                /* Pulsing User list skeleton rows */
+                <div className="space-y-4 animate-pulse">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-16 w-full bg-white/20 dark:bg-white/5 border border-white/20 dark:border-white/5 rounded-2xl" />
+                  ))}
+                </div>
+              ) : filteredUsers.length === 0 ? (
                 <div className="py-12 border border-dashed border-[#B88D15]/20 rounded-2xl text-center bg-[#FAF6E3]/5">
                   <p className="text-xs text-slate-500 font-bold">No users match your search criteria.</p>
                 </div>
               ) : (
-                filteredUsers.map((u) => (
+                <div className="space-y-4 animate-slide-fade-in">
+                  {filteredUsers.map((u) => (
                   <div
                     key={u.id}
                     className="p-4 rounded-2xl border border-[#7B52AB]/15 bg-[#FAF6E3]/40 dark:bg-[#7B52AB]/5 hover:bg-[#FAF6E3]/60 dark:hover:bg-[#7B52AB]/10 hover:border-[#7B52AB]/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm"
@@ -246,7 +302,8 @@ export default function AdminClient({
                       </div>
                     </div>
                   </div>
-                ))
+                ))}
+                </div>
               )}
             </div>
           </div>

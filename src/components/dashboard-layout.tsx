@@ -47,6 +47,7 @@ interface DashboardLayoutProps {
   onDeleteTask?: (id: string) => Promise<void> | void;
   onSignOut?: () => void;
   isDeletingTaskId?: string | null;
+  isLoading?: boolean;
   children: React.ReactNode;
 }
 
@@ -58,6 +59,7 @@ export default function DashboardLayout({
   onDeleteTask,
   onSignOut,
   isDeletingTaskId = null,
+  isLoading = false,
   children
 }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -322,7 +324,18 @@ export default function DashboardLayout({
               </h4>
 
               <div className="flex-1 overflow-y-auto mt-3 space-y-2.5 pr-1">
-                {activeTasks.length === 0 ? (
+                {isLoading ? (
+                  /* Pulsing reminders skeleton list */
+                  [1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="p-3 rounded-xl border border-[#B88D15]/10 bg-[#FAF6E3]/20 dark:bg-white/5 backdrop-blur-md flex items-center justify-between gap-3 animate-pulse"
+                    >
+                      <div className="h-3 bg-slate-400/30 dark:bg-slate-700/50 rounded w-2/3" />
+                      <div className="w-6 h-6 rounded bg-slate-400/30 dark:bg-slate-700/50" />
+                    </div>
+                  ))
+                ) : activeTasks.length === 0 ? (
                   <div className="p-5 rounded-2xl border border-[#B88D15]/20 bg-[#B88D15]/5 text-center flex flex-col items-center gap-2">
                     <p className="text-[11px] text-slate-500 font-bold">
                       No active reminders. Go to My Reminders to add some!
@@ -501,14 +514,29 @@ export default function DashboardLayout({
                 <History className="w-4.5 h-4.5 text-[#B88D15]" />
                 Focus History
               </h3>
-              <span className="text-xs bg-[#7B52AB]/15 text-[#3E2361] font-extrabold px-2.5 py-1 rounded-full border border-[#7B52AB]/30 shadow-sm">
-                {completedTasks.length} Done
-              </span>
+              {isLoading ? (
+                <span className="h-5 w-12 bg-[#7B52AB]/10 rounded-full animate-pulse border border-[#7B52AB]/20" />
+              ) : (
+                <span className="text-xs bg-[#7B52AB]/15 text-[#3E2361] font-extrabold px-2.5 py-1 rounded-full border border-[#7B52AB]/30 shadow-sm">
+                  {completedTasks.length} Done
+                </span>
+              )}
             </div>
 
             {/* Completed list */}
             <div className="flex-1 overflow-y-auto py-4 space-y-3 pr-1">
-              {completedTasks.length === 0 ? (
+              {isLoading ? (
+                /* Pulsing history skeleton list */
+                [1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="p-4 rounded-2xl border border-[#B88D15]/10 bg-[#FAF6E3]/20 dark:bg-white/5 backdrop-blur-md flex flex-col gap-2.5 animate-pulse"
+                  >
+                    <div className="h-4 bg-slate-400/30 dark:bg-slate-700/50 rounded w-5/6" />
+                    <div className="h-3 bg-slate-400/20 dark:bg-slate-700/40 rounded w-1/2" />
+                  </div>
+                ))
+              ) : completedTasks.length === 0 ? (
                 <div className="text-center py-12 text-slate-450 text-xs font-semibold">
                   No completed focus logs yet.
                 </div>

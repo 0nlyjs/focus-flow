@@ -39,6 +39,7 @@ export default function RemindersClient({
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeletingTaskId, setIsDeletingTaskId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(!isGuest);
   const router = useRouter();
 
   const activeTasks = tasks.filter((t) => !t.isCompleted);
@@ -46,9 +47,24 @@ export default function RemindersClient({
   // Sync tasks when initialTasks changes (only for authenticated users)
   useEffect(() => {
     if (!isGuest) {
-      setTasks(initialTasks);
+      async function fetchTasks() {
+        try {
+          const res = await fetch("/api/tasks");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.tasks) {
+              setTasks(data.tasks);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch reminders:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      fetchTasks();
     }
-  }, [initialTasks, isGuest]);
+  }, [isGuest]);
 
   // Guest Mode: Load tasks from localStorage on client mount
   useEffect(() => {
@@ -163,6 +179,7 @@ export default function RemindersClient({
       isGuest={isGuest}
       onDeleteTask={handleDeleteTask}
       isDeletingTaskId={isDeletingTaskId}
+      isLoading={isLoading}
     >
       {/* Centered Main Workspace Container */}
       <div className="flex-1 flex justify-center overflow-y-auto w-full transition-all duration-300 py-6 sm:py-8">
@@ -226,7 +243,24 @@ export default function RemindersClient({
             </h3>
 
             <div className="pb-4">
-              {activeTasks.length === 0 ? (
+              {isLoading ? (
+                /* Pulsing Cards Skeleton Grid */
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="glass-tray h-48 p-6 flex flex-col justify-between gap-5 text-left">
+                      <div className="flex flex-col gap-2.5">
+                        <div className="h-3 w-24 bg-slate-400/25 dark:bg-slate-700/50 rounded" />
+                        <div className="h-4 w-full bg-slate-400/20 dark:bg-slate-700/40 rounded" />
+                        <div className="h-4 w-2/3 bg-slate-400/20 dark:bg-slate-700/40 rounded" />
+                      </div>
+                      <div className="flex justify-between border-t border-[#7B52AB]/15 pt-4">
+                        <div className="w-24 h-8 bg-slate-400/20 dark:bg-white/10 rounded-full" />
+                        <div className="w-8 h-8 rounded-full bg-slate-400/20 dark:bg-white/10" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : activeTasks.length === 0 ? (
                 <div className="p-10 glass-tray text-center flex flex-col items-center justify-center gap-4 py-16">
                   <div className="p-4 rounded-full bg-white/20 dark:bg-[#7B52AB]/15 border border-[#7B52AB]/20 shadow-inner backdrop-blur-md text-[#7B52AB] shrink-0">
                     <BellRing className="w-8 h-8 text-[#7B52AB]" />
@@ -239,7 +273,7 @@ export default function RemindersClient({
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-fade-in">
                   {activeTasks.map((t) => (
                     <div
                       key={t.id}

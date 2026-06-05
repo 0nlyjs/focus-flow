@@ -303,6 +303,7 @@ export default function DashboardClient({
   const [isFinishing, setIsFinishing] = useState(false);
   const [isLoggingInterval, setIsLoggingInterval] = useState(false);
   const [isDeletingTaskId, setIsDeletingTaskId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(!isGuest);
   const [currentQuote, setCurrentQuote] = useState(INSPIRATIONAL_QUOTES[0]);
   const [greeting, setGreeting] = useState("");
   const [dashboardQuote, setDashboardQuote] = useState("");
@@ -374,9 +375,24 @@ export default function DashboardClient({
   // Sync tasks when initialTasks changes (only for authenticated users)
   useEffect(() => {
     if (!isGuest) {
-      setTasks(initialTasks);
+      async function fetchTasks() {
+        try {
+          const res = await fetch("/api/tasks");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.tasks) {
+              setTasks(data.tasks);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch tasks:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      fetchTasks();
     }
-  }, [initialTasks, isGuest]);
+  }, [isGuest]);
 
   // Guest Mode: Load tasks from localStorage on client mount
   useEffect(() => {
@@ -741,12 +757,38 @@ export default function DashboardClient({
       onDeleteTask={handleDeleteTask}
       onSignOut={handleSignOut}
       isDeletingTaskId={isDeletingTaskId}
+      isLoading={isLoading}
     >
       {/* Scrollable single column dashboard workspace layout */}
       <div className="flex-1 flex flex-col gap-6 pr-1 transition-all duration-300 overflow-y-auto py-6 sm:py-8 max-w-3xl mx-auto w-full items-stretch">
-        {activeTask ? (
+        {isLoading ? (
+          /* Pulsing Form Skeleton Card */
+          <div className="w-full p-8 sm:p-10 glass-tray flex flex-col justify-center gap-6 shrink-0 animate-pulse">
+            <div className="flex flex-col text-left gap-3">
+              <div className="h-9 w-48 bg-slate-400/20 dark:bg-slate-700/50 rounded" />
+              <div className="h-5 w-72 bg-slate-400/10 dark:bg-slate-700/40 rounded" />
+            </div>
+            <div className="space-y-6 mt-4">
+              <div className="flex flex-col gap-2">
+                <div className="h-3 w-36 bg-slate-400/10 dark:bg-slate-700/40 rounded px-2" />
+                <div className="w-full h-12 bg-white/20 dark:bg-white/5 border border-white/20 dark:border-white/5 rounded-full" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <div className="h-3 w-20 bg-slate-400/10 dark:bg-slate-700/40 rounded px-2" />
+                  <div className="w-full h-12 bg-white/20 dark:bg-white/5 border border-white/20 dark:border-white/5 rounded-full" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="h-3 w-36 bg-slate-400/10 dark:bg-slate-700/40 rounded px-2" />
+                  <div className="w-full h-12 bg-white/20 dark:bg-white/5 border border-white/20 dark:border-white/5 rounded-full" />
+                </div>
+              </div>
+              <div className="w-full h-14 bg-slate-400/25 dark:bg-white/10 rounded-full" />
+            </div>
+          </div>
+        ) : activeTask ? (
           /* Active Focus Timer State (Aesthetic Music Player Dial Style - Rectangle Card) */
-          <div className="w-full p-8 sm:p-10 glass-tray relative overflow-hidden flex flex-col items-center justify-center gap-6 shrink-0">
+          <div className="w-full p-8 sm:p-10 glass-tray relative overflow-hidden flex flex-col items-center justify-center gap-6 shrink-0 animate-slide-fade-in">
             <div className="z-10 flex flex-col items-center gap-4 sm:gap-5 text-center max-w-lg w-full">
               {/* Handwritten Cozy Encouragement Text */}
               <div className="font-caveat text-4xl text-[#7B52AB] py-0.5">
@@ -849,7 +891,7 @@ export default function DashboardClient({
           </div>
         ) : (
           /* Config & Form Centered State - Rectangle Card */
-          <div className="w-full p-8 sm:p-10 glass-tray flex flex-col justify-center gap-6 shrink-0">
+          <div className="w-full p-8 sm:p-10 glass-tray flex flex-col justify-center gap-6 shrink-0 animate-slide-fade-in">
             <div className="flex flex-col text-left gap-2">
               <h2 className="text-4xl font-black text-[#7B52AB] tracking-tight">
                 {greeting}
@@ -1044,12 +1086,24 @@ export default function DashboardClient({
         )}
 
         {/* Calendar widget at bottom */}
-        {!activeTask && (
-          <FocusHistoryCalendar
-            tasks={tasks}
-            selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
-          />
+        {isLoading ? (
+          /* Pulsing Calendar Skeleton Card */
+          <div className="w-full glass-tray p-4 sm:p-5 flex flex-col gap-3.5 shrink-0 animate-pulse">
+            <div className="flex items-center justify-between">
+              <div className="h-4 w-28 bg-slate-400/25 dark:bg-slate-700/50 rounded" />
+              <div className="h-7 w-28 bg-white/20 dark:bg-white/5 border border-white/20 dark:border-white/5 rounded-lg" />
+            </div>
+            <div className="grid grid-cols-7 gap-1.5 h-28 bg-white/10 dark:bg-white/5 rounded-xl p-2" />
+            <div className="h-4 w-full bg-slate-400/10 dark:bg-slate-700/30 rounded-md mt-2" />
+          </div>
+        ) : !activeTask && (
+          <div className="animate-slide-fade-in">
+            <FocusHistoryCalendar
+              tasks={tasks}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+            />
+          </div>
         )}
       </div>
 

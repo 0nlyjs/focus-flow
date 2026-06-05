@@ -33,37 +33,19 @@ export default async function RemindersPage() {
     image: null,
   };
 
-  // If authenticated, load tasks from DB
+  // If authenticated, load user details
   if (session && session.user && session.user.id) {
     userDetails = {
       name: session.user.name || null,
       email: session.user.email || "",
       image: session.user.image || null,
     };
-
-    const tasks = await prisma.task.findMany({
-      where: {
-        userId: session.user.id,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    formattedTasks = tasks.map((task) => ({
-      id: task.id,
-      title: task.title,
-      allocatedTime: task.allocatedTime,
-      spentTime: task.spentTime,
-      isCompleted: task.isCompleted,
-      createdAt: task.createdAt.toISOString(),
-    }));
   }
 
   return (
     <RemindersClient
       user={userDetails}
-      initialTasks={formattedTasks}
+      initialTasks={[]}
       isGuest={isGuest}
     />
   );

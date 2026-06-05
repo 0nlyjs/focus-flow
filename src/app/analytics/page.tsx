@@ -33,60 +33,23 @@ export default async function AnalyticsPage() {
     image: null,
   };
 
-  // If authenticated, load tasks from DB
+  // If authenticated, load user details
   if (session && session.user && session.user.id) {
     userDetails = {
       name: session.user.name || null,
       email: session.user.email || "",
       image: session.user.image || null,
     };
-
-    const tasks = await prisma.task.findMany({
-      where: {
-        userId: session.user.id,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    formattedTasks = tasks.map((task) => ({
-      id: task.id,
-      title: task.title,
-      allocatedTime: task.allocatedTime,
-      spentTime: task.spentTime,
-      isCompleted: task.isCompleted,
-      createdAt: task.createdAt.toISOString(),
-    }));
-  }
-
-  // Load global aggregates
-  let completedTasksCount = 0;
-  let totalSpentMinutes = 0;
-
-  try {
-    completedTasksCount = await prisma.task.count({
-      where: { isCompleted: true },
-    });
-
-    const totalTimeAgg = await prisma.task.aggregate({
-      where: { isCompleted: true },
-      _sum: { spentTime: true },
-    });
-
-    totalSpentMinutes = totalTimeAgg._sum.spentTime || 0;
-  } catch (error) {
-    console.warn("Database connection failed during build or request:", error);
   }
 
   return (
     <AnalyticsClient
       user={userDetails}
-      initialTasks={formattedTasks}
+      initialTasks={[]}
       isGuest={isGuest}
       metrics={{
-        completedTasksCount,
-        totalSpentMinutes,
+        completedTasksCount: 0,
+        totalSpentMinutes: 0,
       }}
     />
   );
