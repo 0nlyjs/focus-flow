@@ -105,20 +105,28 @@ interface FocusHistoryCalendarProps {
   onSelectDate: (date: Date) => void;
 }
 
-function FocusHistoryCalendar({ tasks, selectedDate, onSelectDate }: FocusHistoryCalendarProps) {
+function FocusHistoryCalendar({
+  tasks,
+  selectedDate,
+  onSelectDate,
+}: FocusHistoryCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const handlePrevMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1),
+    );
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
+    );
   };
 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
-  
+
   const firstDayIndex = new Date(year, month, 1).getDay();
   const daysCount = new Date(year, month + 1, 0).getDate();
 
@@ -135,11 +143,17 @@ function FocusHistoryCalendar({ tasks, selectedDate, onSelectDate }: FocusHistor
   const getFocusTimeForDate = (date: Date) => {
     const dateStr = date.toDateString();
     return tasks
-      .filter(t => t.isCompleted && new Date(t.createdAt).toDateString() === dateStr)
+      .filter(
+        (t) =>
+          t.isCompleted && new Date(t.createdAt).toDateString() === dateStr,
+      )
       .reduce((sum, t) => sum + t.spentTime, 0);
   };
 
-  const monthName = currentMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  const monthName = currentMonth.toLocaleDateString(undefined, {
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <div className="w-full glass-tray p-4 sm:p-5 flex flex-col gap-3">
@@ -171,7 +185,10 @@ function FocusHistoryCalendar({ tasks, selectedDate, onSelectDate }: FocusHistor
 
       <div className="grid grid-cols-7 gap-1">
         {dayNames.map((d) => (
-          <div key={d} className="text-[9px] font-black text-slate-500 uppercase tracking-wider text-center py-0.5">
+          <div
+            key={d}
+            className="text-[9px] font-black text-slate-500 uppercase tracking-wider text-center py-0.5"
+          >
             {d}
           </div>
         ))}
@@ -182,7 +199,8 @@ function FocusHistoryCalendar({ tasks, selectedDate, onSelectDate }: FocusHistor
           }
 
           const dateVal = item.date;
-          const isSelected = dateVal.toDateString() === selectedDate.toDateString();
+          const isSelected =
+            dateVal.toDateString() === selectedDate.toDateString();
           const isToday = dateVal.toDateString() === new Date().toDateString();
           const focusTime = getFocusTimeForDate(dateVal);
           const hasHistory = focusTime > 0;
@@ -196,8 +214,8 @@ function FocusHistoryCalendar({ tasks, selectedDate, onSelectDate }: FocusHistor
                 isSelected
                   ? "bg-[#7B52AB] text-white border-[#7B52AB] shadow-sm scale-[1.03]"
                   : isToday
-                  ? "bg-white/35 dark:bg-white/10 text-[#3E2361] dark:text-white border-[#7B52AB]/40"
-                  : "bg-white/10 hover:bg-white/20 dark:bg-white/0 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 border-transparent"
+                    ? "bg-white/35 dark:bg-white/10 text-[#3E2361] dark:text-white border-[#7B52AB]/40"
+                    : "bg-white/10 hover:bg-white/20 dark:bg-white/0 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 border-transparent"
               }`}
             >
               <span>{item.dayNumber}</span>
@@ -219,11 +237,19 @@ function FocusHistoryCalendar({ tasks, selectedDate, onSelectDate }: FocusHistor
           {selectedDate.toDateString() === new Date().toDateString() ? (
             <span>Today's Total Focus Time:</span>
           ) : (
-            <span>Focus Time ({selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}):</span>
+            <span>
+              Focus Time (
+              {selectedDate.toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+              })}
+              ):
+            </span>
           )}
         </div>
         <div className="text-base font-black text-[#7B52AB] dark:text-[#EDE8F5]">
-          {getFocusTimeForDate(selectedDate)} <span className="text-[10px] font-bold text-slate-500">mins</span>
+          {getFocusTimeForDate(selectedDate)}{" "}
+          <span className="text-[10px] font-bold text-slate-500">mins</span>
         </div>
       </div>
     </div>
@@ -261,6 +287,11 @@ export default function DashboardClient({
   // Timer values in seconds
   const [secondsRemaining, setSecondsRemaining] = useState(0);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
+  const secondsElapsedRef = useRef(0);
+
+  useEffect(() => {
+    secondsElapsedRef.current = secondsElapsed;
+  }, [secondsElapsed]);
 
   const [showLogIntervalConfirm, setShowLogIntervalConfirm] = useState(false);
   const [showFinishSuccess, setShowFinishSuccess] = useState(false);
@@ -281,10 +312,16 @@ export default function DashboardClient({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (timeModeRef.current && !timeModeRef.current.contains(event.target as Node)) {
+      if (
+        timeModeRef.current &&
+        !timeModeRef.current.contains(event.target as Node)
+      ) {
         setIsTimeModeOpen(false);
       }
-      if (allocatedTimeRef.current && !allocatedTimeRef.current.contains(event.target as Node)) {
+      if (
+        allocatedTimeRef.current &&
+        !allocatedTimeRef.current.contains(event.target as Node)
+      ) {
         setIsAllocatedTimeOpen(false);
       }
     }
@@ -393,7 +430,10 @@ export default function DashboardClient({
   const handleAutoFinish = () => {
     setTimerState("idle");
     if (activeTask) {
-      const finalSpent = Math.max(1, Math.round((secondsElapsed + 1) / 60));
+      const finalSpent = Math.max(
+        1,
+        Math.round((secondsElapsedRef.current + 1) / 60),
+      );
       finishTaskRequest(activeTask.id, finalSpent);
     }
   };
@@ -402,6 +442,7 @@ export default function DashboardClient({
     setActiveTask(task);
     setTimerState("running");
     setSecondsElapsed(0);
+    secondsElapsedRef.current = 0;
     if (timeMode === "countdown") {
       setSecondsRemaining(task.allocatedTime * 60);
     } else {
@@ -644,8 +685,9 @@ export default function DashboardClient({
   };
 
   const handleSignOut = async () => {
-    document.cookie = "guest-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    
+    document.cookie =
+      "guest-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
     if (isGuest) {
       window.location.href = "/";
     } else {
@@ -831,9 +873,13 @@ export default function DashboardClient({
                       className="w-full text-left px-6 py-3.5 glass-pill-white text-slate-900 focus:outline-none transition-all text-sm font-bold flex items-center justify-between cursor-pointer shadow-sm"
                     >
                       <span>
-                        {timeMode === "countdown" ? "Countdown Mode" : "Count Up Mode"}
+                        {timeMode === "countdown"
+                          ? "Countdown Mode"
+                          : "Count Up Mode"}
                       </span>
-                      <ChevronRight className={`w-4 h-4 text-slate-500 transition-transform ${isTimeModeOpen ? "-rotate-90" : "rotate-90"}`} />
+                      <ChevronRight
+                        className={`w-4 h-4 text-slate-500 transition-transform ${isTimeModeOpen ? "-rotate-90" : "rotate-90"}`}
+                      />
                     </button>
 
                     {isTimeModeOpen && (
@@ -894,11 +940,15 @@ export default function DashboardClient({
                     <button
                       type="button"
                       disabled={timeMode === "countup"}
-                      onClick={() => setIsAllocatedTimeOpen(!isAllocatedTimeOpen)}
+                      onClick={() =>
+                        setIsAllocatedTimeOpen(!isAllocatedTimeOpen)
+                      }
                       className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-slate-200/20 text-slate-500 disabled:opacity-0 transition-all cursor-pointer flex items-center justify-center"
                       title="Quick Select Time"
                     >
-                      <ChevronRight className={`w-4 h-4 transition-transform ${isAllocatedTimeOpen ? "-rotate-90" : "rotate-90"}`} />
+                      <ChevronRight
+                        className={`w-4 h-4 transition-transform ${isAllocatedTimeOpen ? "-rotate-90" : "rotate-90"}`}
+                      />
                     </button>
 
                     {isAllocatedTimeOpen && timeMode !== "countup" && (
@@ -931,11 +981,13 @@ export default function DashboardClient({
                       </div>
                     )}
                   </div>
-                  {timeMode === "countdown" && parseInt(allocatedTimeVal, 10) > 360 && (
-                    <p className="text-[11px] text-pink-600 font-bold px-2 mt-1">
-                      Maximum session is 6 hours (360 mins). Start small—great things are built step by step!
-                    </p>
-                  )}
+                  {timeMode === "countdown" &&
+                    parseInt(allocatedTimeVal, 10) > 360 && (
+                      <p className="text-[11px] text-pink-600 font-bold px-2 mt-1">
+                        Maximum session is 6 hours (360 mins). Start small—great
+                        things are built step by step!
+                      </p>
+                    )}
                 </div>
               </div>
 
