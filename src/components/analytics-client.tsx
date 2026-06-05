@@ -274,7 +274,7 @@ export default function AnalyticsClient({
           </div>
 
           {/* Section Header with Select Filter */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full bg-[#FAF6E3]/40 dark:bg-[#7B52AB]/10 p-4 rounded-2xl border border-[#7B52AB]/20 shadow-sm transition-all duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full bg-[#FAF6E3]/40 dark:bg-[#7B52AB]/10 p-4 rounded-2xl border border-[#7B52AB]/20 shadow-sm transition-all duration-300 relative z-10">
             <div className="flex items-center gap-2">
               <Clock className="w-4.5 h-4.5 text-[#B88D15]" />
               <span className="text-xs font-black text-slate-800 uppercase tracking-widest">

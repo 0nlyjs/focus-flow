@@ -894,7 +894,7 @@ export default function DashboardClient({
           </div>
         ) : (
           /* Config & Form Centered State - Rectangle Card */
-          <div className="w-full p-8 sm:p-10 glass-tray flex flex-col justify-center gap-6 shrink-0 animate-slide-fade-in">
+          <div className="w-full p-8 sm:p-10 glass-tray relative z-10 flex flex-col justify-center gap-6 shrink-0 animate-slide-fade-in">
             <div className="flex flex-col text-left gap-2">
               <h2 className="text-4xl font-black text-[#7B52AB] tracking-tight">
                 {greeting}
