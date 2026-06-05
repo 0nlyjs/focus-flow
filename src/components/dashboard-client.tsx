@@ -451,7 +451,7 @@ export default function DashboardClient({
     if (activeTask) {
       const finalSpent = Math.max(
         1,
-        Math.round((secondsElapsedRef.current + 1) / 60),
+        Math.ceil(secondsElapsedRef.current / 60),
       );
       finishTaskRequest(activeTask.id, finalSpent);
     }
@@ -482,6 +482,9 @@ export default function DashboardClient({
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
+    if (timeMode === "countup") {
+      formData.set("allocatedTime", "0");
+    }
     const title = formData.get("title")?.toString() || "";
     const allocatedTimeStr = formData.get("allocatedTime")?.toString() || "25";
     const allocatedTime = parseInt(allocatedTimeStr, 10);
@@ -594,7 +597,7 @@ export default function DashboardClient({
 
   const handleFinishActive = () => {
     if (!activeTask) return;
-    const finalSpent = Math.max(1, Math.round(secondsElapsed / 60));
+    const finalSpent = Math.max(1, Math.ceil(secondsElapsed / 60));
     finishTaskRequest(activeTask.id, finalSpent);
   };
 
@@ -605,7 +608,7 @@ export default function DashboardClient({
   const confirmLogProgressActive = async () => {
     if (!activeTask) return;
     setIsLoggingInterval(true);
-    const finalSpent = Math.max(1, Math.round(secondsElapsed / 60));
+    const finalSpent = Math.max(1, Math.ceil(secondsElapsed / 60));
 
     const intervalTitle = `${activeTask.title} [interval:${activeTask.id}]`;
 
@@ -743,8 +746,8 @@ export default function DashboardClient({
   const totalDuration = activeTask ? activeTask.allocatedTime * 60 : 1;
   const progressPercent =
     timeMode === "countdown"
-      ? (secondsRemaining / totalDuration) * 100
-      : Math.min((secondsElapsed / totalDuration) * 100, 100);
+      ? (totalDuration > 0 ? (secondsRemaining / totalDuration) * 100 : 0)
+      : 0;
 
   const strokeDashoffset = 502 - (502 * progressPercent) / 100;
 
@@ -1122,8 +1125,8 @@ export default function DashboardClient({
               <p className="text-xs text-slate-600 font-bold leading-relaxed max-w-sm">
                 This will save your current focus session of{" "}
                 <strong className="text-[#7B52AB]">
-                  {Math.max(1, Math.round(secondsElapsed / 60))}{" "}
-                  {Math.max(1, Math.round(secondsElapsed / 60)) === 1
+                  {Math.max(1, Math.ceil(secondsElapsed / 60))}{" "}
+                  {Math.max(1, Math.ceil(secondsElapsed / 60)) === 1
                     ? "minute"
                     : "minutes"}
                 </strong>{" "}

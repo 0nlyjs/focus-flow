@@ -7,7 +7,7 @@ import { z } from "zod";
 
 const CreateTaskSchema = z.object({
   title: z.string().trim().min(1, "Task description cannot be empty").max(280, "Task description cannot exceed 280 characters"),
-  allocatedTime: z.number().int().min(1, "Allocated time must be at least 1 minute"),
+  allocatedTime: z.number().int().min(0, "Allocated time must be non-negative"),
 });
 
 export async function createTask(prevState: any, formData: FormData) {
