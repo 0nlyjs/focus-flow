@@ -23,7 +23,6 @@ interface AnalyticsClientProps {
   metrics: {
     completedTasksCount: number;
     totalSpentMinutes: number;
-    userCount: number;
   };
 }
 
@@ -198,7 +197,7 @@ export default function AnalyticsClient({
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
             {/* Card 1: Total Minutes */}
             <div className="glass-tray relative p-6 group overflow-hidden shadow-md">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -221,18 +220,6 @@ export default function AnalyticsClient({
                 {userCompletedTasksCount.toLocaleString()}
               </h2>
               <p className="text-[10px] text-slate-500 font-bold">Fully resolved focus blocks logged.</p>
-            </div>
-
-            {/* Card 3: Active Members */}
-            <div className="glass-tray relative p-6 group overflow-hidden shadow-md">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Users className="w-20 h-20 text-[#7B52AB]" />
-              </div>
-              <p className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-2">Total Creators</p>
-              <h2 className="text-3xl font-black text-slate-900 tracking-tight font-mono mb-2">
-                {metrics.userCount.toLocaleString()}
-              </h2>
-              <p className="text-[10px] text-slate-500 font-bold">Unique focusers registered via email.</p>
             </div>
           </div>
 

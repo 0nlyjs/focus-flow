@@ -63,7 +63,6 @@ export default async function AnalyticsPage() {
   // Load global aggregates
   let completedTasksCount = 0;
   let totalSpentMinutes = 0;
-  let userCount = 0;
 
   try {
     completedTasksCount = await prisma.task.count({
@@ -76,7 +75,6 @@ export default async function AnalyticsPage() {
     });
 
     totalSpentMinutes = totalTimeAgg._sum.spentTime || 0;
-    userCount = await prisma.user.count();
   } catch (error) {
     console.warn("Database connection failed during build or request:", error);
   }
@@ -89,7 +87,6 @@ export default async function AnalyticsPage() {
       metrics={{
         completedTasksCount,
         totalSpentMinutes,
-        userCount,
       }}
     />
   );

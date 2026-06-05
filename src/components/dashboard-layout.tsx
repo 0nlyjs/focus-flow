@@ -300,6 +300,12 @@ export default function DashboardLayout({
                 <BarChart3 className="w-4 h-4 text-[#B88D15]" />
                 Analytics
               </Link>
+              {user.email === "mistjs20@gmail.com" && (
+                <Link href="/admin" className={getLinkClasses("/admin")}>
+                  <UserCog className="w-4 h-4 text-[#7B52AB]" />
+                  Admin Panel
+                </Link>
+              )}
             </nav>
 
             {/* Active Reminders List (Active Task Queue) */}
