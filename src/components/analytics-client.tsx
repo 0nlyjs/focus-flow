@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { BarChart3, Clock, Trophy, Users, Star, History, AlertTriangle } from "lucide-react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import { BarChart3, Clock, Trophy, Users, Star, History, AlertTriangle, ChevronRight } from "lucide-react";
 import DashboardLayout from "@/components/dashboard-layout";
 
 interface Task {
@@ -26,6 +26,41 @@ interface AnalyticsClientProps {
   };
 }
 
+function filterTasksByTimeframe(tasksList: Task[], range: string) {
+  const now = new Date();
+  
+  // Set start of today: 00:00:00.000 local time
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  
+  // Start of week: 7 days ago (including today) at 00:00:00.000 local time
+  const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+  
+  // Start of month: 30 days ago at 00:00:00.000 local time
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29);
+  
+  // Start of year: 365 days ago at 00:00:00.000 local time
+  const startOfYear = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate() + 1);
+
+  return tasksList.filter((task) => {
+    if (!task.createdAt) return false;
+    const taskDate = new Date(task.createdAt);
+
+    switch (range) {
+      case "today":
+        return taskDate >= startOfToday;
+      case "week":
+        return taskDate >= startOfWeek;
+      case "month":
+        return taskDate >= startOfMonth;
+      case "year":
+        return taskDate >= startOfYear;
+      case "all":
+      default:
+        return true;
+    }
+  });
+}
+
 export default function AnalyticsClient({
   user,
   initialTasks,
@@ -33,6 +68,24 @@ export default function AnalyticsClient({
   metrics,
 }: AnalyticsClientProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [timeframe, setTimeframe] = useState<string>("week");
+  const [isTimeframeOpen, setIsTimeframeOpen] = useState(false);
+  const timeframeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        timeframeRef.current &&
+        !timeframeRef.current.contains(event.target as Node)
+      ) {
+        setIsTimeframeOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Sync tasks when initialTasks changes (only for authenticated users)
   useEffect(() => {
@@ -41,9 +94,14 @@ export default function AnalyticsClient({
     }
   }, [initialTasks, isGuest]);
 
-  // Compute user's personal analytics dynamically from tasks state
-  const userCompletedTasksCount = tasks.filter((t) => t.isCompleted).length;
-  const userTotalSpentMinutes = tasks.filter((t) => t.isCompleted).reduce((sum, t) => sum + t.spentTime, 0);
+  // Filter tasks based on selected timeframe
+  const filteredTasks = useMemo(() => {
+    return filterTasksByTimeframe(tasks, timeframe);
+  }, [tasks, timeframe]);
+
+  // Compute user's personal analytics dynamically from filteredTasks state
+  const userCompletedTasksCount = filteredTasks.filter((t) => t.isCompleted).length;
+  const userTotalSpentMinutes = filteredTasks.filter((t) => t.isCompleted).reduce((sum, t) => sum + t.spentTime, 0);
 
   // Guest Mode: Load tasks from localStorage on client mount
   useEffect(() => {
@@ -92,7 +150,7 @@ export default function AnalyticsClient({
 
   // Group tasks by original task identity to calculate interval statistics
   const taskGroups: { [key: string]: Task[] } = {};
-  tasks.forEach((t) => {
+  filteredTasks.forEach((t) => {
     const match = t.title.match(/\[(chunk|interval):([^\]]+)\]$/);
     const parentId = match ? match[2] : t.id;
     if (!taskGroups[parentId]) {
@@ -194,6 +252,68 @@ export default function AnalyticsClient({
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Section Header with Select Filter */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full bg-[#FAF6E3]/40 dark:bg-[#7B52AB]/10 p-4 rounded-2xl border border-[#7B52AB]/20 shadow-sm transition-all duration-300">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4.5 h-4.5 text-[#B88D15]" />
+              <span className="text-xs font-black text-slate-800 uppercase tracking-widest">
+                Productivity Overview
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2.5 self-end sm:self-auto relative" ref={timeframeRef}>
+              <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">
+                Timeframe:
+              </span>
+              <div className="relative w-40">
+                <button
+                  type="button"
+                  onClick={() => setIsTimeframeOpen(!isTimeframeOpen)}
+                  className="w-full text-left px-4 py-2 glass-pill-white text-[#3E2361] focus:outline-none transition-all text-xs font-bold flex items-center justify-between cursor-pointer shadow-sm border border-[#7B52AB]/20 animate-fade-in"
+                >
+                  <span>
+                    {timeframe === "today" && "Today"}
+                    {timeframe === "week" && "This Week"}
+                    {timeframe === "month" && "This Month"}
+                    {timeframe === "year" && "This Year"}
+                    {timeframe === "all" && "All Time"}
+                  </span>
+                  <ChevronRight
+                    className={`w-3.5 h-3.5 text-slate-500 transition-transform ${isTimeframeOpen ? "-rotate-90" : "rotate-90"}`}
+                  />
+                </button>
+
+                {isTimeframeOpen && (
+                  <div className="absolute right-0 left-0 mt-2 z-50 bg-[#FAF6E3]/75 dark:bg-[#3E2361]/85 backdrop-blur-xl border border-[#7B52AB]/30 rounded-2xl py-1.5 overflow-hidden shadow-xl animate-modal-scale-up">
+                    {[
+                      { label: "Today", value: "today" },
+                      { label: "This Week", value: "week" },
+                      { label: "This Month", value: "month" },
+                      { label: "This Year", value: "year" },
+                      { label: "All Time", value: "all" },
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => {
+                          setTimeframe(opt.value);
+                          setIsTimeframeOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
+                          timeframe === opt.value
+                            ? "bg-[#7B52AB]/15 text-[#3E2361]"
+                            : "text-slate-700 hover:text-slate-900 hover:bg-[#7B52AB]/5"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Stats Grid */}
