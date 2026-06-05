@@ -46,6 +46,7 @@ interface DashboardLayoutProps {
   activeTask?: Task | null;
   onDeleteTask?: (id: string) => Promise<void> | void;
   onSignOut?: () => void;
+  isDeletingTaskId?: string | null;
   children: React.ReactNode;
 }
 
@@ -56,11 +57,13 @@ export default function DashboardLayout({
   activeTask = null,
   onDeleteTask,
   onSignOut,
+  isDeletingTaskId = null,
   children
 }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -116,10 +119,12 @@ export default function DashboardLayout({
         "WARNING: Are you sure you want to permanently delete your account? All your tasks, settings, and account details will be deleted forever. This action cannot be undone."
       )
     ) {
+      setIsDeletingAccount(true);
       try {
         const res = await deleteAccountAction();
         if (res?.error) {
           alert(res.error);
+          setIsDeletingAccount(false);
         } else {
           if (onSignOut) {
             onSignOut();
@@ -129,6 +134,7 @@ export default function DashboardLayout({
         }
       } catch (err: any) {
         alert("Failed to delete account. Please try again.");
+        setIsDeletingAccount(false);
       }
     }
   };
@@ -341,11 +347,16 @@ export default function DashboardLayout({
                         </button>
                         {onDeleteTask && (
                           <button
+                            disabled={isDeletingTaskId === t.id}
                             onClick={() => onDeleteTask(t.id)}
-                            className="p-1.5 rounded-lg bg-[#FAF6E3]/60 text-slate-500 hover:bg-rose-500/10 hover:text-rose-600 transition-all border border-[#B88D15]/10 cursor-pointer"
+                            className="p-1.5 rounded-lg bg-[#FAF6E3]/60 text-slate-500 hover:bg-rose-500/10 hover:text-rose-600 transition-all border border-[#B88D15]/10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Delete Reminder"
                           >
-                            <Trash2 className="w-3 h-3" />
+                            {isDeletingTaskId === t.id ? (
+                              <div className="w-3 h-3 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <Trash2 className="w-3 h-3" />
+                            )}
                           </button>
                         )}
                       </div>
@@ -530,11 +541,16 @@ export default function DashboardLayout({
                       </div>
                       {onDeleteTask && (
                         <button
+                          disabled={isDeletingTaskId === t.id}
                           onClick={() => onDeleteTask(t.id)}
-                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-650 cursor-pointer transition-all"
+                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-650 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Delete permanently"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          {isDeletingTaskId === t.id ? (
+                            <div className="w-3.5 h-3.5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Trash2 className="w-3.5 h-3.5" />
+                          )}
                         </button>
                       )}
                     </div>
@@ -637,11 +653,21 @@ export default function DashboardLayout({
                 </h4>
                 <button
                   type="button"
+                  disabled={isDeletingAccount}
                   onClick={handleDeleteAccount}
-                  className="w-full flex items-center justify-center gap-2 border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 text-red-600 dark:text-red-400 font-extrabold py-3 px-4 rounded-2xl transition-all text-xs uppercase tracking-wider shadow-sm cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 text-red-600 dark:text-red-400 font-extrabold py-3 px-4 rounded-2xl transition-all text-xs uppercase tracking-wider shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Delete My Account</span>
+                  {isDeletingAccount ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                      <span>Deleting Account...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete My Account</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

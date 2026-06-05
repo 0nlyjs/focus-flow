@@ -300,6 +300,9 @@ export default function DashboardClient({
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const [isLoggingInterval, setIsLoggingInterval] = useState(false);
+  const [isDeletingTaskId, setIsDeletingTaskId] = useState<string | null>(null);
   const [currentQuote, setCurrentQuote] = useState(INSPIRATIONAL_QUOTES[0]);
   const [greeting, setGreeting] = useState("");
   const [dashboardQuote, setDashboardQuote] = useState("");
@@ -526,6 +529,7 @@ export default function DashboardClient({
     taskId: string,
     spentTimeMinutes: number,
   ) => {
+    setIsFinishing(true);
     if (isGuest) {
       const updated = tasks.map((t) =>
         t.id === taskId
@@ -535,6 +539,7 @@ export default function DashboardClient({
       saveGuestTasks(updated);
       setLoggedMinutes(spentTimeMinutes);
       setShowFinishSuccess(true);
+      setIsFinishing(false);
       return;
     }
 
@@ -566,6 +571,8 @@ export default function DashboardClient({
     } catch (err) {
       console.error(err);
       alert("Error finishing task. Please try again.");
+    } finally {
+      setIsFinishing(false);
     }
   };
 
@@ -580,8 +587,8 @@ export default function DashboardClient({
   };
 
   const confirmLogProgressActive = async () => {
-    setShowLogIntervalConfirm(false);
     if (!activeTask) return;
+    setIsLoggingInterval(true);
     const finalSpent = Math.max(1, Math.round(secondsElapsed / 60));
 
     const intervalTitle = `${activeTask.title} [interval:${activeTask.id}]`;
@@ -604,6 +611,8 @@ export default function DashboardClient({
       setTimerState("idle");
       setSecondsElapsed(0);
       setSecondsRemaining(0);
+      setIsLoggingInterval(false);
+      setShowLogIntervalConfirm(false);
       router.push("/dashboard");
       return;
     }
@@ -626,11 +635,14 @@ export default function DashboardClient({
         setTimerState("idle");
         setSecondsElapsed(0);
         setSecondsRemaining(0);
+        setShowLogIntervalConfirm(false);
         router.push("/dashboard");
       }
     } catch (err: any) {
       console.error(err);
       alert(err.message || "Error logging task progress.");
+    } finally {
+      setIsLoggingInterval(false);
     }
   };
 
@@ -646,6 +658,7 @@ export default function DashboardClient({
   // API Request or local delete: Delete Task
   const handleDeleteTask = async (taskId: string) => {
     if (!confirm("Are you sure you want to delete this task?")) return;
+    setIsDeletingTaskId(taskId);
 
     if (isGuest) {
       const updated = tasks.filter((t) => t.id !== taskId);
@@ -656,6 +669,7 @@ export default function DashboardClient({
         setSecondsRemaining(0);
         setSecondsElapsed(0);
       }
+      setIsDeletingTaskId(null);
       return;
     }
 
@@ -681,6 +695,8 @@ export default function DashboardClient({
     } catch (err) {
       console.error(err);
       alert("Error deleting task.");
+    } finally {
+      setIsDeletingTaskId(null);
     }
   };
 
@@ -724,6 +740,7 @@ export default function DashboardClient({
       activeTask={activeTask}
       onDeleteTask={handleDeleteTask}
       onSignOut={handleSignOut}
+      isDeletingTaskId={isDeletingTaskId}
     >
       {/* Scrollable single column dashboard workspace layout */}
       <div className="flex-1 flex flex-col gap-6 pr-1 transition-all duration-300 overflow-y-auto py-6 sm:py-8 max-w-3xl mx-auto w-full items-stretch">
@@ -811,11 +828,21 @@ export default function DashboardClient({
                 </button>
                 <button
                   onClick={handleFinishActive}
-                  className="flex items-center justify-center gap-1.5 glass-pill-orange font-extrabold py-3 px-2 text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer"
+                  disabled={isFinishing}
+                  className="flex items-center justify-center gap-1.5 glass-pill-orange font-extrabold py-3 px-2 text-[10px] sm:text-xs uppercase tracking-wider cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Complete the entire task"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  Finish Task
+                  {isFinishing ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-[#3e2361] border-t-transparent rounded-full animate-spin" />
+                      Completing...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Finish Task
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -998,10 +1025,19 @@ export default function DashboardClient({
                   (timeMode === "countdown" &&
                     (!allocatedTimeVal || parseInt(allocatedTimeVal, 10) > 360))
                 }
-                className="w-full flex items-center justify-center gap-2 glass-pill-orange font-extrabold py-4 px-4 text-sm uppercase tracking-wider cursor-pointer disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 glass-pill-orange font-extrabold py-4 px-4 text-sm uppercase tracking-wider cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "Creating..." : "Start Focus Session"}
-                <Play className="w-4 h-4 fill-current transition-transform group-hover:scale-105" />
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-[#3e2361] border-t-transparent rounded-full animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    Start Focus Session
+                    <Play className="w-4 h-4 fill-current transition-transform group-hover:scale-105" />
+                  </>
+                )}
               </button>
             </form>
           </div>
@@ -1044,16 +1080,25 @@ export default function DashboardClient({
 
             <div className="flex flex-col sm:flex-row gap-3 w-full mt-2">
               <button
+                disabled={isLoggingInterval}
                 onClick={() => setShowLogIntervalConfirm(false)}
-                className="flex-1 flex items-center justify-center glass-pill-white font-extrabold py-3.5 px-4 text-[10px] uppercase tracking-wider cursor-pointer"
+                className="flex-1 flex items-center justify-center glass-pill-white font-extrabold py-3.5 px-4 text-[10px] uppercase tracking-wider cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
+                disabled={isLoggingInterval}
                 onClick={confirmLogProgressActive}
-                className="flex-1 flex items-center justify-center glass-pill-orange font-extrabold py-3.5 px-4 text-[10px] uppercase tracking-wider cursor-pointer"
+                className="flex-1 flex items-center justify-center glass-pill-orange font-extrabold py-3.5 px-4 text-[10px] uppercase tracking-wider cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Yes, Log Interval
+                {isLoggingInterval ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-[#3e2361] border-t-transparent rounded-full animate-spin mr-1.5" />
+                    Logging...
+                  </>
+                ) : (
+                  "Yes, Log Interval"
+                )}
               </button>
             </div>
           </div>

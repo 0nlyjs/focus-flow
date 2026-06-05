@@ -38,6 +38,7 @@ export default function RemindersClient({
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeletingTaskId, setIsDeletingTaskId] = useState<string | null>(null);
   const router = useRouter();
 
   const activeTasks = tasks.filter((t) => !t.isCompleted);
@@ -121,10 +122,12 @@ export default function RemindersClient({
 
   const handleDeleteTask = async (taskId: string) => {
     if (!confirm("Are you sure you want to delete this reminder?")) return;
+    setIsDeletingTaskId(taskId);
 
     if (isGuest) {
       const updated = tasks.filter((t) => t.id !== taskId);
       saveGuestTasks(updated);
+      setIsDeletingTaskId(null);
       return;
     }
 
@@ -144,6 +147,8 @@ export default function RemindersClient({
     } catch (err) {
       console.error(err);
       alert("Error deleting reminder.");
+    } finally {
+      setIsDeletingTaskId(null);
     }
   };
 
@@ -157,6 +162,7 @@ export default function RemindersClient({
       tasks={tasks}
       isGuest={isGuest}
       onDeleteTask={handleDeleteTask}
+      isDeletingTaskId={isDeletingTaskId}
     >
       {/* Centered Main Workspace Container */}
       <div className="flex-1 flex justify-center overflow-y-auto w-full transition-all duration-300 py-6 sm:py-8">
@@ -198,9 +204,16 @@ export default function RemindersClient({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="glass-pill-orange font-extrabold py-4 px-8 text-xs uppercase tracking-wider whitespace-nowrap cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shrink-0"
+                className="glass-pill-orange font-extrabold py-4 px-8 text-xs uppercase tracking-wider whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shrink-0"
               >
-                {isSubmitting ? "Adding..." : "Add to Queue"}
+                {isSubmitting ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  "Add to Queue"
+                )}
               </button>
             </form>
           </div>
@@ -253,11 +266,16 @@ export default function RemindersClient({
                           Start Focus
                         </button>
                         <button
+                          disabled={isDeletingTaskId === t.id}
                           onClick={() => handleDeleteTask(t.id)}
-                          className="p-2.5 rounded-full bg-[#FAF6E3]/60 dark:bg-[#7B52AB]/15 text-slate-500 hover:bg-rose-500/10 hover:text-rose-600 transition-all border border-[#7B52AB]/20 cursor-pointer"
+                          className="p-2.5 rounded-full bg-[#FAF6E3]/60 dark:bg-[#7B52AB]/15 text-slate-500 hover:bg-rose-500/10 hover:text-rose-600 transition-all border border-[#7B52AB]/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Delete Reminder"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          {isDeletingTaskId === t.id ? (
+                            <div className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
                         </button>
                       </div>
                     </div>

@@ -36,6 +36,18 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoggingInGuest, setIsLoggingInGuest] = useState(false);
+
+  const onGuestClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setIsLoggingInGuest(true);
+    try {
+      await handleGuestLogin();
+    } catch (err) {
+      // ignore redirect
+    }
+  };
+
   const [errorMessage, setErrorMessage] = useState("");
   const [isDark, setIsDark] = useState(true);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
@@ -579,14 +591,23 @@ export default function Home() {
               </ul>
             </div>
 
-            <form action={handleGuestLogin} className="mt-8">
+            <div className="mt-8 w-full">
               <button
-                type="submit"
-                className="w-full text-center bg-[#7B52AB]/78 hover:bg-[#7B52AB]/90 border border-[#7B52AB]/40 text-white font-extrabold py-3.5 px-4 rounded-2xl transition-all text-xs uppercase tracking-wider shadow-md hover:shadow-lg backdrop-blur-md"
+                type="button"
+                disabled={isLoggingInGuest}
+                onClick={onGuestClick}
+                className="w-full text-center bg-[#7B52AB]/78 hover:bg-[#7B52AB]/90 border border-[#7B52AB]/40 text-white font-extrabold py-3.5 px-4 rounded-2xl transition-all text-xs uppercase tracking-wider shadow-md hover:shadow-lg backdrop-blur-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Get Started
+                {isLoggingInGuest ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Starting Session...
+                  </>
+                ) : (
+                  "Get Started"
+                )}
               </button>
-            </form>
+            </div>
           </div>
 
           {/* Pro Tier */}
@@ -677,9 +698,15 @@ export default function Home() {
             <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Features</button>
             <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Methodology</button>
             <button type="button" className={`lp-footer-link text-xs font-bold transition-colors text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Pricing</button>
-            <form action={handleGuestLogin} className="inline">
-              <button type="submit" className={`lp-footer-link text-xs font-bold transition-colors block text-left ${isDark ? "text-[#6B6080] hover:text-[#A89FC0]" : "text-slate-400 hover:text-slate-800"}`}>Guest Mode</button>
-            </form>
+            <button
+              type="button"
+              disabled={isLoggingInGuest}
+              onClick={onGuestClick}
+              className={`lp-footer-link text-xs font-bold transition-colors block text-left cursor-pointer disabled:opacity-50 flex items-center gap-1.5`}
+            >
+              {isLoggingInGuest && <div className="w-2.5 h-2.5 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" />}
+              Guest Mode
+            </button>
           </div>
           <div className="flex flex-col gap-3.5">
             <h4 className={`lp-h4 text-xs font-black uppercase tracking-wider ${isDark ? "text-[#EDE8F5]" : "text-slate-800"}`}>Resources</h4>
@@ -829,11 +856,20 @@ export default function Home() {
                       {/* Login Submit Button */}
                       <button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isLoggingInGuest}
                         className="w-full flex items-center justify-center gap-2 bg-[#7B52AB]/78 hover:bg-[#7B52AB]/90 border border-[#7B52AB]/40 text-white font-extrabold py-3.5 px-4 rounded-2xl transition-all text-xs uppercase tracking-wider shadow-md hover:shadow-lg disabled:opacity-70 cursor-pointer mt-2"
                       >
-                        {isSubmitting ? "Signing In..." : "Log In"}
-                        <ArrowRight className="w-4 h-4" />
+                        {isSubmitting ? (
+                          <>
+                            <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Signing In...
+                          </>
+                        ) : (
+                          <>
+                            Log In
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
                       </button>
                     </form>
 
@@ -865,16 +901,17 @@ export default function Home() {
 
                     {/* Guest Mode option below Google */}
                     <div className="pt-2 text-center">
-                      <form action={handleGuestLogin} className="inline">
-                        <button
-                          type="submit"
-                          className={`text-xs font-bold underline transition-colors cursor-pointer ${
-                            isDark ? "text-[#A89FC0] hover:text-[#EDE8F5]" : "text-slate-555 hover:text-[#7B52AB]"
-                          }`}
-                        >
-                          Use Guest Mode
-                        </button>
-                      </form>
+                      <button
+                        type="button"
+                        disabled={isLoggingInGuest}
+                        onClick={onGuestClick}
+                        className={`text-xs font-bold underline transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 ${
+                          isDark ? "text-[#A89FC0] hover:text-[#EDE8F5]" : "text-slate-555 hover:text-[#7B52AB]"
+                        }`}
+                      >
+                        {isLoggingInGuest && <div className="w-2.5 h-2.5 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" />}
+                        Use Guest Mode
+                      </button>
                     </div>
                   </div>
                 ) : (
@@ -955,11 +992,20 @@ export default function Home() {
                       {/* Sign Up Submit Button */}
                       <button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isLoggingInGuest}
                         className="w-full flex items-center justify-center gap-2 bg-[#7B52AB]/78 hover:bg-[#7B52AB]/90 border border-[#7B52AB]/40 text-white font-extrabold py-3.5 px-4 rounded-2xl transition-all text-xs uppercase tracking-wider shadow-md hover:shadow-lg disabled:opacity-70 cursor-pointer mt-2"
                       >
-                        {isSubmitting ? "Creating Account..." : "Sign Up"}
-                        <ArrowRight className="w-4 h-4" />
+                        {isSubmitting ? (
+                          <>
+                            <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Creating Account...
+                          </>
+                        ) : (
+                          <>
+                            Sign Up
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
                       </button>
                     </form>
 
@@ -991,16 +1037,17 @@ export default function Home() {
 
                     {/* Guest Mode option below Google */}
                     <div className="pt-2 text-center">
-                      <form action={handleGuestLogin} className="inline">
-                        <button
-                          type="submit"
-                          className={`text-xs font-bold underline transition-colors cursor-pointer ${
-                            isDark ? "text-[#A89FC0] hover:text-[#EDE8F5]" : "text-slate-555 hover:text-[#7B52AB]"
-                          }`}
-                        >
-                          Use Guest Mode
-                        </button>
-                      </form>
+                      <button
+                        type="button"
+                        disabled={isLoggingInGuest}
+                        onClick={onGuestClick}
+                        className={`text-xs font-bold underline transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 ${
+                          isDark ? "text-[#A89FC0] hover:text-[#EDE8F5]" : "text-slate-555 hover:text-[#7B52AB]"
+                        }`}
+                      >
+                        {isLoggingInGuest && <div className="w-2.5 h-2.5 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" />}
+                        Use Guest Mode
+                      </button>
                     </div>
                   </div>
                 )}
