@@ -98,7 +98,7 @@ export default function DashboardLayout({
   // Set default sidebar state based on screen size on mount
   useEffect(() => {
     setIsMounted(true);
-    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+    if (typeof window !== "undefined" && window.innerWidth < 1280) {
       setIsSidebarOpen(false);
     }
   }, []);
