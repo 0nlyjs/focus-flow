@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { createTask } from "@/app/actions/task-actions";
 import DashboardLayout from "@/components/dashboard-layout";
+import { useTimer } from "@/components/timer-context";
 
 interface Task {
   id: string;
@@ -35,58 +36,20 @@ export default function RemindersClient({
   initialTasks,
   isGuest = false,
 }: RemindersClientProps) {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const {
+    tasks,
+    setTasks,
+    isLoading,
+    isDeletingTaskId,
+    handleDeleteTask,
+    saveGuestTasks,
+  } = useTimer();
+
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeletingTaskId, setIsDeletingTaskId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(!isGuest);
   const router = useRouter();
 
   const activeTasks = tasks.filter((t) => !t.isCompleted);
-
-  // Sync tasks when initialTasks changes (only for authenticated users)
-  useEffect(() => {
-    if (!isGuest) {
-      async function fetchTasks() {
-        try {
-          const res = await fetch("/api/tasks");
-          if (res.ok) {
-            const data = await res.json();
-            if (data.success && data.tasks) {
-              setTasks(data.tasks);
-            }
-          }
-        } catch (error) {
-          console.error("Failed to fetch reminders:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-      fetchTasks();
-    }
-  }, [isGuest]);
-
-  // Guest Mode: Load tasks from localStorage on client mount
-  useEffect(() => {
-    if (isGuest) {
-      const stored = localStorage.getItem("focusflow_guest_tasks");
-      if (stored) {
-        try {
-          setTasks(JSON.parse(stored));
-        } catch (e) {
-          console.error("Failed to parse guest tasks:", e);
-        }
-      } else {
-        setTasks([]);
-      }
-    }
-  }, [isGuest]);
-
-  // Helper to save guest tasks
-  const saveGuestTasks = (newTasks: Task[]) => {
-    setTasks(newTasks);
-    localStorage.setItem("focusflow_guest_tasks", JSON.stringify(newTasks));
-  };
 
   const handleAddReminder = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -133,38 +96,6 @@ export default function RemindersClient({
         const newTask: Task = res.task;
         setTasks((prev) => [newTask, ...prev]);
       }
-    }
-  };
-
-  const handleDeleteTask = async (taskId: string) => {
-    if (!confirm("Are you sure you want to delete this reminder?")) return;
-    setIsDeletingTaskId(taskId);
-
-    if (isGuest) {
-      const updated = tasks.filter((t) => t.id !== taskId);
-      saveGuestTasks(updated);
-      setIsDeletingTaskId(null);
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/tasks/${taskId}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to delete task");
-      }
-
-      const json = await res.json();
-      if (json.success) {
-        setTasks((prev) => prev.filter((t) => t.id !== taskId));
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error deleting reminder.");
-    } finally {
-      setIsDeletingTaskId(null);
     }
   };
 

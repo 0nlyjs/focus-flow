@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Sintony, Caveat } from "next/font/google";
 import "./globals.css";
+import { cookies } from "next/headers";
+import { TimerProvider } from "@/components/timer-context";
 
 const sintony = Sintony({
   variable: "--font-sintony",
@@ -20,11 +22,14 @@ export const metadata: Metadata = {
 
 import InteractiveParticles from "@/components/interactive-particles";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const isGuest = cookieStore.get("guest-session")?.value === "true";
+
   return (
     <html
       lang="en"
@@ -41,7 +46,9 @@ export default function RootLayout({
 
         {/* Root content wrapper */}
         <div className="relative z-10 flex-1 flex flex-col min-h-screen">
-          {children}
+          <TimerProvider isGuest={isGuest}>
+            {children}
+          </TimerProvider>
         </div>
       </body>
     </html>

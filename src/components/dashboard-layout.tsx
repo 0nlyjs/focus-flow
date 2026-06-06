@@ -25,6 +25,7 @@ import {
 
 import { syncGuestTasks } from "@/app/actions/task-actions";
 import { updateNameAction, deleteAccountAction, signOutAction } from "@/app/actions/auth-actions";
+import { useTimer } from "@/components/timer-context";
 
 interface Task {
   id: string;
@@ -53,15 +54,27 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({
   user,
-  tasks,
+  tasks: propTasks,
   isGuest = false,
-  activeTask = null,
-  onDeleteTask,
+  activeTask: propActiveTask = null,
+  onDeleteTask: propOnDeleteTask,
   onSignOut,
-  isDeletingTaskId = null,
-  isLoading = false,
+  isDeletingTaskId: propIsDeletingTaskId = null,
+  isLoading: propIsLoading = false,
   children
 }: DashboardLayoutProps) {
+  const {
+    tasks,
+    isLoading,
+    activeTask,
+    timerState,
+    timeMode,
+    secondsRemaining,
+    secondsElapsed,
+    isDeletingTaskId,
+    handleDeleteTask: onDeleteTask
+  } = useTimer();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
@@ -204,6 +217,12 @@ export default function DashboardLayout({
     }
   };
 
+  const formatTime = (totalSeconds: number) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
   const getLinkClasses = (path: string) => {
     const isActive = pathname === path;
     const base = "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all";
@@ -229,6 +248,28 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Top Bar Timer Widget */}
+            {activeTask && timerState !== "idle" && pathname !== "/dashboard" && (
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 hover:border-white/35 text-[#F7F1D9] hover:scale-[1.02] active:scale-95 transition-all duration-300 shadow-sm shrink-0 cursor-pointer text-xs"
+                title="Active Session - Click to view dashboard"
+              >
+                <span className="relative flex h-2 w-2">
+                  {timerState === "running" && (
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  )}
+                  <span className={`relative inline-flex rounded-full h-2 w-2 ${timerState === "running" ? "bg-emerald-400" : "bg-amber-400"}`}></span>
+                </span>
+                <span className="font-extrabold max-w-[80px] sm:max-w-[150px] truncate leading-none">
+                  {activeTask.title}
+                </span>
+                <span className="font-mono font-black bg-[#5C4578]/40 px-2 py-0.5 rounded text-[11px] sm:text-xs">
+                  {formatTime(timeMode === "countdown" ? secondsRemaining : secondsElapsed)}
+                </span>
+              </Link>
+            )}
+
             {/* Dark / Light toggle */}
             <button
               id="theme-toggle"

@@ -24,6 +24,7 @@ import {
 import { createTask, logTaskInterval } from "@/app/actions/task-actions";
 import { useSearchParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/components/dashboard-layout";
+import { useTimer } from "@/components/timer-context";
 
 interface Task {
   id: string;
@@ -261,16 +262,38 @@ export default function DashboardClient({
   initialTasks,
   isGuest = false,
 }: DashboardClientProps) {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [activeTask, setActiveTask] = useState<Task | null>(null);
-  const [timeMode, setTimeMode] = useState<"countdown" | "countup">(
-    "countdown",
-  );
-  const [timerState, setTimerState] = useState<"idle" | "running" | "paused">(
-    "idle",
-  );
+  const {
+    tasks,
+    setTasks,
+    isLoading,
+    activeTask,
+    setActiveTask,
+    timerState,
+    setTimerState,
+    timeMode,
+    setTimeMode,
+    secondsRemaining,
+    setSecondsRemaining,
+    secondsElapsed,
+    setSecondsElapsed,
+    showFinishSuccess,
+    setShowFinishSuccess,
+    showLogIntervalConfirm,
+    setShowLogIntervalConfirm,
+    loggedMinutes,
+    setLoggedMinutes,
+    isFinishing,
+    isLoggingInterval,
+    isDeletingTaskId,
+    startFocus,
+    finishTaskRequest,
+    confirmLogProgressActive: contextConfirmLogProgressActive,
+    handleDeleteTask,
+    saveGuestTasks,
+    handleExitToDashboard: contextHandleExitToDashboard,
+  } = useTimer();
 
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const searchParams = useSearchParams();
   const router = useRouter();
   const queryTitle = searchParams.get("title");
@@ -284,26 +307,9 @@ export default function DashboardClient({
     }
   }, [queryTitle]);
 
-  // Timer values in seconds
-  const [secondsRemaining, setSecondsRemaining] = useState(0);
-  const [secondsElapsed, setSecondsElapsed] = useState(0);
-  const secondsElapsedRef = useRef(0);
-
-  useEffect(() => {
-    secondsElapsedRef.current = secondsElapsed;
-  }, [secondsElapsed]);
-
-  const [showLogIntervalConfirm, setShowLogIntervalConfirm] = useState(false);
-  const [showFinishSuccess, setShowFinishSuccess] = useState(false);
-  const [loggedMinutes, setLoggedMinutes] = useState(0);
-
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isFinishing, setIsFinishing] = useState(false);
-  const [isLoggingInterval, setIsLoggingInterval] = useState(false);
-  const [isDeletingTaskId, setIsDeletingTaskId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(!isGuest);
   const [currentQuote, setCurrentQuote] = useState(INSPIRATIONAL_QUOTES[0]);
   const [greeting, setGreeting] = useState("");
   const [dashboardQuote, setDashboardQuote] = useState("");
@@ -358,8 +364,6 @@ export default function DashboardClient({
     setDashboardQuote(INSPIRATIONAL_QUOTES[randomIdx]);
   }, [user.name, isGuest]);
 
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
   // Rotate quotes every focus session sequentially in a loop
   useEffect(() => {
     if (activeTask) {
@@ -371,109 +375,6 @@ export default function DashboardClient({
       setCurrentQuote(INSPIRATIONAL_QUOTES[nextIndex]);
     }
   }, [activeTask]);
-
-  // Sync tasks when initialTasks changes (only for authenticated users)
-  useEffect(() => {
-    if (!isGuest) {
-      async function fetchTasks() {
-        try {
-          const res = await fetch("/api/tasks");
-          if (res.ok) {
-            const data = await res.json();
-            if (data.success && data.tasks) {
-              setTasks(data.tasks);
-            }
-          }
-        } catch (error) {
-          console.error("Failed to fetch tasks:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-      fetchTasks();
-    }
-  }, [isGuest]);
-
-  // Guest Mode: Load tasks from localStorage on client mount
-  useEffect(() => {
-    if (isGuest) {
-      const stored = localStorage.getItem("focusflow_guest_tasks");
-      if (stored) {
-        try {
-          setTasks(JSON.parse(stored));
-        } catch (e) {
-          console.error("Failed to parse guest tasks:", e);
-        }
-      } else {
-        setTasks([]);
-      }
-    }
-  }, [isGuest]);
-
-  // Clean up interval on unmount
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
-
-  // Timer logic
-  useEffect(() => {
-    if (timerState === "running") {
-      intervalRef.current = setInterval(() => {
-        if (timeMode === "countdown") {
-          setSecondsRemaining((prev) => {
-            if (prev <= 1) {
-              handleAutoFinish();
-              return 0;
-            }
-            return prev - 1;
-          });
-          setSecondsElapsed((prev) => prev + 1);
-        } else {
-          setSecondsElapsed((prev) => prev + 1);
-        }
-      }, 1000);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [timerState, timeMode]);
-
-  const handleAutoFinish = () => {
-    setTimerState("idle");
-    if (activeTask) {
-      const finalSpent = Math.max(
-        1,
-        Math.ceil(secondsElapsedRef.current / 60),
-      );
-      finishTaskRequest(activeTask.id, finalSpent);
-    }
-  };
-
-  const startFocus = (task: Task) => {
-    setActiveTask(task);
-    setTimerState("running");
-    setSecondsElapsed(0);
-    secondsElapsedRef.current = 0;
-    if (timeMode === "countdown") {
-      setSecondsRemaining(task.allocatedTime * 60);
-    } else {
-      setSecondsRemaining(0);
-    }
-  };
-
-  // Helper to save guest tasks
-  const saveGuestTasks = (newTasks: Task[]) => {
-    setTasks(newTasks);
-    localStorage.setItem("focusflow_guest_tasks", JSON.stringify(newTasks));
-  };
 
   // Handle form submission (Server Action or local storage)
   const handleStartFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -516,7 +417,7 @@ export default function DashboardClient({
       form.reset();
       setTaskTitle("");
 
-      startFocus(guestTask);
+      startFocus(guestTask, timeMode);
     } else {
       const res = await createTask(null, formData);
       setIsSubmitting(false);
@@ -538,60 +439,8 @@ export default function DashboardClient({
         } else {
           setTasks((prev) => [newTask, ...prev]);
         }
-        startFocus(newTask);
+        startFocus(newTask, timeMode);
       }
-    }
-  };
-
-  // API Request or local complete: Finish Task
-  const finishTaskRequest = async (
-    taskId: string,
-    spentTimeMinutes: number,
-  ) => {
-    setIsFinishing(true);
-    if (isGuest) {
-      const updated = tasks.map((t) =>
-        t.id === taskId
-          ? { ...t, isCompleted: true, spentTime: spentTimeMinutes }
-          : t,
-      );
-      saveGuestTasks(updated);
-      setLoggedMinutes(spentTimeMinutes);
-      setShowFinishSuccess(true);
-      setIsFinishing(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/tasks/${taskId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ spentTime: spentTimeMinutes }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to complete task");
-      }
-
-      const json = await res.json();
-      if (json.success) {
-        setTasks((prev) =>
-          prev.map((t) =>
-            t.id === taskId
-              ? { ...t, isCompleted: true, spentTime: spentTimeMinutes }
-              : t,
-          ),
-        );
-        setLoggedMinutes(spentTimeMinutes);
-        setShowFinishSuccess(true);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error finishing task. Please try again.");
-    } finally {
-      setIsFinishing(false);
     }
   };
 
@@ -606,117 +455,13 @@ export default function DashboardClient({
   };
 
   const confirmLogProgressActive = async () => {
-    if (!activeTask) return;
-    setIsLoggingInterval(true);
-    const finalSpent = Math.max(1, Math.ceil(secondsElapsed / 60));
-
-    const intervalTitle = `${activeTask.title} [interval:${activeTask.id}]`;
-
-    if (isGuest) {
-      const guestInterval: Task = {
-        id: crypto.randomUUID(),
-        title: intervalTitle,
-        allocatedTime: activeTask.allocatedTime,
-        spentTime: finalSpent,
-        isCompleted: true,
-        createdAt: new Date().toISOString(),
-      };
-
-      const updated = [guestInterval, ...tasks];
-      saveGuestTasks(updated);
-
-      // Reset timer state and exit UI
-      setActiveTask(null);
-      setTimerState("idle");
-      setSecondsElapsed(0);
-      setSecondsRemaining(0);
-      setIsLoggingInterval(false);
-      setShowLogIntervalConfirm(false);
-      router.push("/dashboard");
-      return;
-    }
-
-    try {
-      const res = await logTaskInterval(
-        activeTask.id,
-        intervalTitle,
-        finalSpent,
-        activeTask.allocatedTime,
-      );
-      if (res.error) {
-        throw new Error(res.error);
-      }
-      if (res.success && res.task) {
-        setTasks((prev) => [res.task as Task, ...prev]);
-
-        // Reset timer state and exit UI
-        setActiveTask(null);
-        setTimerState("idle");
-        setSecondsElapsed(0);
-        setSecondsRemaining(0);
-        setShowLogIntervalConfirm(false);
-        router.push("/dashboard");
-      }
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Error logging task progress.");
-    } finally {
-      setIsLoggingInterval(false);
-    }
-  };
-
-  const handleExitToDashboard = () => {
-    setShowFinishSuccess(false);
-    setActiveTask(null);
-    setTimerState("idle");
-    setSecondsRemaining(0);
-    setSecondsElapsed(0);
+    await contextConfirmLogProgressActive();
     router.push("/dashboard");
   };
 
-  // API Request or local delete: Delete Task
-  const handleDeleteTask = async (taskId: string) => {
-    if (!confirm("Are you sure you want to delete this task?")) return;
-    setIsDeletingTaskId(taskId);
-
-    if (isGuest) {
-      const updated = tasks.filter((t) => t.id !== taskId);
-      saveGuestTasks(updated);
-      if (activeTask?.id === taskId) {
-        setActiveTask(null);
-        setTimerState("idle");
-        setSecondsRemaining(0);
-        setSecondsElapsed(0);
-      }
-      setIsDeletingTaskId(null);
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/tasks/${taskId}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to delete task");
-      }
-
-      const json = await res.json();
-      if (json.success) {
-        setTasks((prev) => prev.filter((t) => t.id !== taskId));
-        if (activeTask?.id === taskId) {
-          setActiveTask(null);
-          setTimerState("idle");
-          setSecondsRemaining(0);
-          setSecondsElapsed(0);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error deleting task.");
-    } finally {
-      setIsDeletingTaskId(null);
-    }
+  const handleExitToDashboard = () => {
+    contextHandleExitToDashboard();
+    router.push("/dashboard");
   };
 
   const handleSignOut = async () => {

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { BarChart3, Clock, Trophy, Users, Star, History, AlertTriangle, ChevronRight } from "lucide-react";
 import DashboardLayout from "@/components/dashboard-layout";
+import { useTimer } from "@/components/timer-context";
 
 interface Task {
   id: string;
@@ -67,11 +68,15 @@ export default function AnalyticsClient({
   isGuest = false,
   metrics,
 }: AnalyticsClientProps) {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const {
+    tasks,
+    isLoading,
+    isDeletingTaskId,
+    handleDeleteTask,
+  } = useTimer();
+
   const [timeframe, setTimeframe] = useState<string>("week");
   const [isTimeframeOpen, setIsTimeframeOpen] = useState(false);
-  const [isDeletingTaskId, setIsDeletingTaskId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(!isGuest);
   const timeframeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -89,28 +94,6 @@ export default function AnalyticsClient({
     };
   }, []);
 
-  // Sync tasks when initialTasks changes (only for authenticated users)
-  useEffect(() => {
-    if (!isGuest) {
-      async function fetchTasks() {
-        try {
-          const res = await fetch("/api/tasks");
-          if (res.ok) {
-            const data = await res.json();
-            if (data.success && data.tasks) {
-              setTasks(data.tasks);
-            }
-          }
-        } catch (error) {
-          console.error("Failed to fetch analytics tasks:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-      fetchTasks();
-    }
-  }, [isGuest]);
-
   // Filter tasks based on selected timeframe
   const filteredTasks = useMemo(() => {
     return filterTasksByTimeframe(tasks, timeframe);
@@ -119,51 +102,6 @@ export default function AnalyticsClient({
   // Compute user's personal analytics dynamically from filteredTasks state
   const userCompletedTasksCount = filteredTasks.filter((t) => t.isCompleted).length;
   const userTotalSpentMinutes = filteredTasks.filter((t) => t.isCompleted).reduce((sum, t) => sum + t.spentTime, 0);
-
-  // Guest Mode: Load tasks from localStorage on client mount
-  useEffect(() => {
-    if (isGuest) {
-      const stored = localStorage.getItem("focusflow_guest_tasks");
-      if (stored) {
-        try {
-          setTasks(JSON.parse(stored));
-        } catch (e) {
-          console.error("Failed to parse guest tasks:", e);
-        }
-      } else {
-        setTasks([]);
-      }
-    }
-  }, [isGuest]);
-
-  const handleDeleteTask = async (taskId: string) => {
-    if (!confirm("Are you sure you want to delete this reminder?")) return;
-
-    if (isGuest) {
-      const updated = tasks.filter((t) => t.id !== taskId);
-      setTasks(updated);
-      localStorage.setItem("focusflow_guest_tasks", JSON.stringify(updated));
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/tasks/${taskId}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to delete task");
-      }
-
-      const json = await res.json();
-      if (json.success) {
-        setTasks((prev) => prev.filter((t) => t.id !== taskId));
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error deleting reminder.");
-    }
-  };
 
   // Group tasks by original task identity to calculate interval statistics
   const taskGroups: { [key: string]: Task[] } = {};
