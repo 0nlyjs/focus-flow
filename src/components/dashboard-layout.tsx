@@ -336,7 +336,7 @@ export default function DashboardLayout({
           onClick={() => {
             setIsSidebarOpen((prev) => {
               const nextVal = !prev;
-              if (nextVal && typeof window !== "undefined" && window.innerWidth < 1024) {
+              if (nextVal && typeof window !== "undefined" && window.innerWidth < 1280) {
                 setIsHistoryOpen(false);
               }
               return nextVal;
@@ -559,7 +559,7 @@ export default function DashboardLayout({
           onClick={() => {
             setIsHistoryOpen((prev) => {
               const nextVal = !prev;
-              if (nextVal && typeof window !== "undefined" && window.innerWidth < 1024) {
+              if (nextVal && typeof window !== "undefined" && window.innerWidth < 1280) {
                 setIsSidebarOpen(false);
               }
               return nextVal;
