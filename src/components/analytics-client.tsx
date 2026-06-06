@@ -158,6 +158,15 @@ export default function AnalyticsClient({
 
   const cleanMaxTitle = maxIntervalsTaskTitle.replace(/\s\[(chunk|interval):[^\]]+\]$/, "");
 
+  const formatSpentTime = (minutes: number) => {
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hrs > 0) {
+      return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
+    }
+    return `${mins}m`;
+  };
+
   return (
     <DashboardLayout
       user={user}
@@ -294,7 +303,7 @@ export default function AnalyticsClient({
                 </div>
                 <p className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider mb-2">Total Focus Time</p>
                 <h2 className="text-3xl font-black text-slate-900 tracking-tight font-mono mb-2">
-                  {userTotalSpentMinutes.toLocaleString()}m
+                  {formatSpentTime(userTotalSpentMinutes)}
                 </h2>
                 <p className="text-[10px] text-slate-500 font-bold">Total minutes spent completing tasks.</p>
               </div>

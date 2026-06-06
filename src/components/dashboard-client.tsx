@@ -156,6 +156,15 @@ function FocusHistoryCalendar({
     year: "numeric",
   });
 
+  const formatSpentTime = (minutes: number) => {
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hrs > 0) {
+      return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
+    }
+    return `${mins}m`;
+  };
+
   return (
     <div className="w-full glass-tray p-4 sm:p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between">
@@ -249,8 +258,7 @@ function FocusHistoryCalendar({
           )}
         </div>
         <div className="text-base font-black text-[#7B52AB] dark:text-[#EDE8F5]">
-          {getFocusTimeForDate(selectedDate)}{" "}
-          <span className="text-[10px] font-bold text-slate-500">mins</span>
+          {formatSpentTime(getFocusTimeForDate(selectedDate))}
         </div>
       </div>
     </div>
