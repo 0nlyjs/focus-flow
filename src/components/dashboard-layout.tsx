@@ -251,7 +251,7 @@ export default function DashboardLayout({
             setIsSidebarOpen(false);
             setIsHistoryOpen(false);
           }}
-          className="fixed inset-0 bg-[#0A0614]/30 backdrop-blur-[2px] lg:hidden cursor-default w-full h-full border-none outline-none"
+          className="fixed inset-0 bg-[#0A0614]/30 backdrop-blur-[2px] xl:hidden cursor-default w-full h-full border-none outline-none"
           style={{ zIndex: 25 }}
           aria-label="Close drawers"
         />
@@ -664,8 +664,8 @@ export default function DashboardLayout({
 
       <div
         className={`flex-1 flex overflow-hidden w-full px-4 sm:px-6 gap-8 relative z-20 items-stretch transition-all duration-300
-          ${isSidebarOpen ? "lg:pl-80" : "lg:pl-0"}
-          ${isHistoryOpen ? "lg:pr-80" : "lg:pr-0"}
+          ${isSidebarOpen ? "xl:pl-80" : "xl:pl-0"}
+          ${isHistoryOpen ? "xl:pr-80" : "xl:pr-0"}
         `}
       >
         {children}
