@@ -411,6 +411,22 @@ export function TimerProvider({
     }
   }, [activeTask, timerState, timeMode, secondsRemaining, secondsElapsed]);
 
+  // Warn user before leaving or refreshing the page if a task is running
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (timerState === "running") {
+        e.preventDefault();
+        e.returnValue = "A focus session is currently running. If you leave, your progress might not be fully saved.";
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [timerState]);
+
   return (
     <TimerContext.Provider
       value={{
