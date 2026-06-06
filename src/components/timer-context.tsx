@@ -416,7 +416,7 @@ export function TimerProvider({
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (timerState === "running") {
         e.preventDefault();
-        e.returnValue = "A focus session is currently running. If you leave, your progress might not be fully saved.";
+        e.returnValue = "An active task is running! Are you sure you want to exit and interrupt your flow session?";
         return e.returnValue;
       }
     };
