@@ -333,7 +333,15 @@ export default function DashboardLayout({
       >
         {/* Sliding MENU Tab Button (connected with no gap) */}
         <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          onClick={() => {
+            setIsSidebarOpen((prev) => {
+              const nextVal = !prev;
+              if (nextVal && typeof window !== "undefined" && window.innerWidth < 1024) {
+                setIsHistoryOpen(false);
+              }
+              return nextVal;
+            });
+          }}
           className="absolute top-1/3 right-0 translate-x-full z-40 flex flex-col items-center gap-2 py-5 px-2.5 bg-[#7B52AB]/15 hover:bg-[#7B52AB]/25 border-y border-r border-[#7B52AB]/20 text-[#3E2361] font-extrabold rounded-r-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer select-none backdrop-blur-md"
           title={isSidebarOpen ? "Close Menu" : "Open Menu"}
         >
@@ -548,7 +556,15 @@ export default function DashboardLayout({
       >
         {/* Sliding Task History Tab Button (connected with no gap) */}
         <button
-          onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+          onClick={() => {
+            setIsHistoryOpen((prev) => {
+              const nextVal = !prev;
+              if (nextVal && typeof window !== "undefined" && window.innerWidth < 1024) {
+                setIsSidebarOpen(false);
+              }
+              return nextVal;
+            });
+          }}
           className="absolute top-1/3 left-0 -translate-x-full z-40 flex flex-col items-center gap-2 py-5 px-2.5 bg-[#7B52AB]/15 hover:bg-[#7B52AB]/25 border-y border-l border-[#7B52AB]/20 text-[#3E2361] font-extrabold rounded-l-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer select-none backdrop-blur-md"
           title={isHistoryOpen ? "Close Task History" : "Open Task History"}
         >
