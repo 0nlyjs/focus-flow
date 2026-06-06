@@ -70,6 +70,7 @@ export function TimerProvider({
   const secondsElapsedRef = useRef(0);
   const activeTaskRef = useRef<Task | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTickRef = useRef<number>(Date.now());
 
   // Sync refs to avoid stale closures in setInterval
   useEffect(() => {
@@ -120,21 +121,36 @@ export function TimerProvider({
     localStorage.setItem("focusflow_guest_tasks", JSON.stringify(newTasks));
   };
 
-  // Timer tick interval logic running globally
+  // Timer tick interval logic running globally (uses timestamps to prevent tab sleep issues)
   useEffect(() => {
     if (timerState === "running") {
+      lastTickRef.current = Date.now();
+
       intervalRef.current = setInterval(() => {
-        if (timeMode === "countdown") {
-          setSecondsRemaining((prev) => {
-            if (prev <= 1) {
-              handleAutoFinish();
-              return 0;
-            }
-            return prev - 1;
-          });
-          setSecondsElapsed((prev) => prev + 1);
-        } else {
-          setSecondsElapsed((prev) => prev + 1);
+        const now = Date.now();
+        const delta = Math.floor((now - lastTickRef.current) / 1000);
+        if (delta >= 1) {
+          lastTickRef.current = now;
+
+          if (timeMode === "countdown") {
+            setSecondsRemaining((prev) => {
+              const nextVal = prev - delta;
+              if (nextVal <= 0) {
+                // Countdown completed
+                setTimerState("idle");
+                const currentActive = activeTaskRef.current;
+                if (currentActive) {
+                  const finalSpent = currentActive.allocatedTime; // full duration
+                  finishTaskRequest(currentActive.id, finalSpent);
+                }
+                return 0;
+              }
+              return nextVal;
+            });
+            setSecondsElapsed((prev) => prev + delta);
+          } else {
+            setSecondsElapsed((prev) => prev + delta);
+          }
         }
       }, 1000);
     } else {
@@ -149,14 +165,43 @@ export function TimerProvider({
     };
   }, [timerState, timeMode]);
 
-  const handleAutoFinish = () => {
-    setTimerState("idle");
-    const currentActive = activeTaskRef.current;
-    if (currentActive) {
-      const finalSpent = Math.max(1, Math.ceil(secondsElapsedRef.current / 60));
-      finishTaskRequest(currentActive.id, finalSpent);
-    }
-  };
+  // Synchronize background time immediately when the tab becomes visible again
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && timerState === "running") {
+        const now = Date.now();
+        const delta = Math.floor((now - lastTickRef.current) / 1000);
+        if (delta >= 1) {
+          lastTickRef.current = now;
+
+          if (timeMode === "countdown") {
+            setSecondsRemaining((prev) => {
+              const nextVal = prev - delta;
+              if (nextVal <= 0) {
+                // Completed in background
+                setTimerState("idle");
+                const currentActive = activeTaskRef.current;
+                if (currentActive) {
+                  const finalSpent = currentActive.allocatedTime;
+                  finishTaskRequest(currentActive.id, finalSpent);
+                }
+                return 0;
+              }
+              return nextVal;
+            });
+            setSecondsElapsed((prev) => prev + delta);
+          } else {
+            setSecondsElapsed((prev) => prev + delta);
+          }
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [timerState, timeMode]);
 
   const startFocus = (task: Task, mode: "countdown" | "countup") => {
     setActiveTask(task);
@@ -164,6 +209,7 @@ export function TimerProvider({
     setTimerState("running");
     setSecondsElapsed(0);
     secondsElapsedRef.current = 0;
+    lastTickRef.current = Date.now(); // Reset tick time
     if (mode === "countdown") {
       setSecondsRemaining(task.allocatedTime * 60);
     } else {
