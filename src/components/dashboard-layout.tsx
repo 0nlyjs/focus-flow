@@ -243,6 +243,19 @@ export default function DashboardLayout({
 
   return (
     <div className="h-screen flex flex-col justify-between bg-transparent overflow-hidden">
+      {/* Backdrop overlay on mobile when sidebar or history is open */}
+      {(isSidebarOpen || isHistoryOpen) && (
+        <button
+          type="button"
+          onClick={() => {
+            setIsSidebarOpen(false);
+            setIsHistoryOpen(false);
+          }}
+          className="fixed inset-0 bg-[#0A0614]/30 backdrop-blur-[2px] lg:hidden cursor-default w-full h-full border-none outline-none"
+          style={{ zIndex: 25 }}
+          aria-label="Close drawers"
+        />
+      )}
 
       {/* Header Top Bar */}
       <header className="lp-header bg-[#8869AA]/85 backdrop-blur-lg sticky top-0 z-40 shadow-sm animate-navbar-wave relative shrink-0">
@@ -321,7 +334,9 @@ export default function DashboardLayout({
         {/* Sliding MENU Tab Button (connected with no gap) */}
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="absolute top-1/3 right-0 translate-x-full z-40 flex flex-col items-center gap-2 py-5 px-2.5 bg-[#7B52AB]/15 hover:bg-[#7B52AB]/25 border-y border-r border-[#7B52AB]/20 text-[#3E2361] font-extrabold rounded-r-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer select-none backdrop-blur-md"
+          className={`absolute top-1/3 right-0 translate-x-full z-40 flex flex-col items-center gap-2 py-5 px-2.5 bg-[#7B52AB]/15 hover:bg-[#7B52AB]/25 border-y border-r border-[#7B52AB]/20 text-[#3E2361] font-extrabold rounded-r-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer select-none backdrop-blur-md ${
+            isSidebarOpen ? "opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto" : "opacity-100"
+          }`}
           title={isSidebarOpen ? "Close Menu" : "Open Menu"}
         >
           {isSidebarOpen ? (
@@ -544,7 +559,9 @@ export default function DashboardLayout({
           {/* Sliding Task History Tab Button (connected with no gap) */}
           <button
             onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-            className="absolute top-1/3 left-0 -translate-x-full z-40 flex flex-col items-center gap-2 py-5 px-2.5 bg-[#7B52AB]/15 hover:bg-[#7B52AB]/25 border-y border-l border-[#7B52AB]/20 text-[#3E2361] font-extrabold rounded-l-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer select-none backdrop-blur-md"
+            className={`absolute top-1/3 left-0 -translate-x-full z-40 flex flex-col items-center gap-2 py-5 px-2.5 bg-[#7B52AB]/15 hover:bg-[#7B52AB]/25 border-y border-l border-[#7B52AB]/20 text-[#3E2361] font-extrabold rounded-l-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer select-none backdrop-blur-md ${
+              isHistoryOpen ? "opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto" : "opacity-100"
+            }`}
             title={isHistoryOpen ? "Close Task History" : "Open Task History"}
           >
             {isHistoryOpen ? (
