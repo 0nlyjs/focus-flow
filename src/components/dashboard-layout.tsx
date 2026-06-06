@@ -79,6 +79,7 @@ export default function DashboardLayout({
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -93,6 +94,14 @@ export default function DashboardLayout({
   useEffect(() => {
     setProfileName(user.name || "");
   }, [user.name]);
+
+  // Set default sidebar state based on screen size on mount
+  useEffect(() => {
+    setIsMounted(true);
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
+  }, []);
 
   const handleUpdateName = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -305,7 +314,9 @@ export default function DashboardLayout({
       <div
         className={`${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } w-80 border-r border-[#7B52AB]/20 bg-[#7B52AB]/10 shadow-2xl pt-24 pb-6 px-6 backdrop-blur-lg fixed inset-y-0 left-0 z-30 h-full transition-all duration-300 shrink-0 flex flex-col`}
+        } w-80 border-r border-[#7B52AB]/20 bg-[#7B52AB]/10 shadow-2xl pt-24 pb-6 px-6 backdrop-blur-lg fixed inset-y-0 left-0 z-30 h-full ${
+          isMounted ? "transition-all duration-300" : ""
+        } shrink-0 flex flex-col`}
       >
         {/* Sliding MENU Tab Button (connected with no gap) */}
         <button

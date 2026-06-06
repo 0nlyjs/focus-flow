@@ -195,7 +195,7 @@ export default function Home() {
     >
       {/* Header / Navbar */}
       <header className="lp-header bg-[#8869AA]/85 backdrop-blur-lg sticky top-0 z-40 shadow-sm animate-navbar-wave relative">
-        <div className="mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">
+        <div className="mx-auto max-w-7xl px-6 py-3 sm:py-5 flex items-center justify-between">
           <Link
             href="/"
             className="font-sans font-semibold text-2xl tracking-tight text-[#F7F1D9]/90 hover:text-[#F7F1D9] transition-colors inline-flex items-center leading-none"
@@ -215,42 +215,44 @@ export default function Home() {
             </a>
           </nav>
 
-          <div className="flex items-center gap-3">
-            {/* Dark / Light toggle */}
-            <button
-              id="theme-toggle"
-              aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
-              onClick={() => setIsDark((d) => !d)}
-              className={`w-12 h-7 rounded-full border transition-all duration-300 flex items-center p-0.5 shadow-inner backdrop-blur-md cursor-pointer shrink-0 ${
-                isDark
-                  ? "border-cyan-400/30 bg-cyan-500/10 shadow-[0_0_12px_rgba(34,211,238,0.07)]"
-                  : "border-amber-400/30 bg-amber-500/10 shadow-[0_0_12px_rgba(245,158,11,0.05)]"
-              }`}
-            >
-              <span
-                className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 bg-white shadow-[0_0_8px_rgba(255,255,255,0.17)] ${
-                  isDark ? "translate-x-5" : "translate-x-0"
+          <div className="flex flex-col items-end gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+            <div className="flex items-center gap-3">
+              {/* Dark / Light toggle */}
+              <button
+                id="theme-toggle"
+                aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+                onClick={() => setIsDark((d) => !d)}
+                className={`w-12 h-7 rounded-full border transition-all duration-300 flex items-center p-0.5 shadow-inner backdrop-blur-md cursor-pointer shrink-0 ${
+                  isDark
+                    ? "border-cyan-400/30 bg-cyan-500/10 shadow-[0_0_12px_rgba(34,211,238,0.07)]"
+                    : "border-amber-400/30 bg-amber-500/10 shadow-[0_0_12px_rgba(245,158,11,0.05)]"
                 }`}
               >
-                {isDark ? (
-                  <Moon className="w-3.5 h-3.5 text-cyan-500 fill-cyan-500/10" />
-                ) : (
-                  <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-500/10" />
-                )}
-              </span>
-            </button>
-
-            {!hasSession && (
-              <button
-                onClick={() => {
-                  setAuthMode("login");
-                  setIsLoginOpen(true);
-                }}
-                className="text-sm font-extrabold text-[#F7F1D9]/80 hover:text-[#F7F1D9] transition-colors px-3 py-2 cursor-pointer"
-              >
-                Login
+                <span
+                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 bg-white shadow-[0_0_8px_rgba(255,255,255,0.17)] ${
+                    isDark ? "translate-x-5" : "translate-x-0"
+                  }`}
+                >
+                  {isDark ? (
+                    <Moon className="w-3.5 h-3.5 text-cyan-500 fill-cyan-500/10" />
+                  ) : (
+                    <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-500/10" />
+                  )}
+                </span>
               </button>
-            )}
+
+              {!hasSession && (
+                <button
+                  onClick={() => {
+                    setAuthMode("login");
+                    setIsLoginOpen(true);
+                  }}
+                  className="text-sm font-extrabold text-[#F7F1D9]/80 hover:text-[#F7F1D9] transition-colors px-3 py-2 cursor-pointer"
+                >
+                  Login
+                </button>
+              )}
+            </div>
             <button
               onClick={() => {
                 if (hasSession) {
@@ -260,7 +262,7 @@ export default function Home() {
                   setIsLoginOpen(true);
                 }
               }}
-              className="bg-[#F7F1D9] hover:bg-[#F7F1D9]/90 text-[#3E2361] font-extrabold px-5 py-2 rounded-full text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all backdrop-blur-md cursor-pointer"
+              className="bg-[#F7F1D9] hover:bg-[#F7F1D9]/90 text-[#3E2361] font-extrabold px-5 py-2 rounded-full text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all backdrop-blur-md cursor-pointer shrink-0"
             >
               {hasSession ? "Go to Dashboard" : "Get Started"}
             </button>
