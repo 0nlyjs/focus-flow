@@ -329,6 +329,88 @@ export function TimerProvider({
     setSecondsElapsed(0);
   };
 
+  // Restore running focus session on mount once tasks are loaded
+  const [hasRestoredActiveTask, setHasRestoredActiveTask] = useState(false);
+
+  useEffect(() => {
+    // Only attempt restoration once tasks list is loaded
+    if (tasks.length === 0 || hasRestoredActiveTask) return;
+
+    const savedSessionStr = localStorage.getItem("focusflow_active_session");
+    if (savedSessionStr) {
+      try {
+        const savedSession = JSON.parse(savedSessionStr);
+        const {
+          activeTaskId,
+          timerState: savedTimerState,
+          timeMode: savedTimeMode,
+          secondsRemaining: savedSecondsRemaining,
+          secondsElapsed: savedSecondsElapsed,
+          savedAt,
+        } = savedSession;
+
+        // Find the task in the loaded tasks list
+        const foundTask = tasks.find((t) => t.id === activeTaskId);
+        if (foundTask && !foundTask.isCompleted) {
+          const elapsedSeconds = Math.floor((Date.now() - savedAt) / 1000);
+
+          if (savedTimerState === "running") {
+            if (savedTimeMode === "countdown") {
+              const newRemaining = savedSecondsRemaining - elapsedSeconds;
+              if (newRemaining <= 0) {
+                // Task finished in background while tab was closed/refreshing
+                const finalSpent = Math.max(
+                  1,
+                  Math.ceil((savedSecondsElapsed + savedSecondsRemaining) / 60)
+                );
+                finishTaskRequest(foundTask.id, finalSpent);
+              } else {
+                setActiveTask(foundTask);
+                setTimeMode(savedTimeMode);
+                setTimerState("running");
+                setSecondsRemaining(newRemaining);
+                setSecondsElapsed(savedSecondsElapsed + elapsedSeconds);
+              }
+            } else {
+              // Countup mode
+              setActiveTask(foundTask);
+              setTimeMode(savedTimeMode);
+              setTimerState("running");
+              setSecondsRemaining(0);
+              setSecondsElapsed(savedSecondsElapsed + elapsedSeconds);
+            }
+          } else if (savedTimerState === "paused") {
+            setActiveTask(foundTask);
+            setTimeMode(savedTimeMode);
+            setTimerState("paused");
+            setSecondsRemaining(savedSecondsRemaining);
+            setSecondsElapsed(savedSecondsElapsed);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to restore active focus session:", e);
+      }
+    }
+    setHasRestoredActiveTask(true);
+  }, [tasks, hasRestoredActiveTask]);
+
+  // Persist running focus session state to localStorage
+  useEffect(() => {
+    if (activeTask) {
+      const sessionData = {
+        activeTaskId: activeTask.id,
+        timerState,
+        timeMode,
+        secondsRemaining,
+        secondsElapsed,
+        savedAt: Date.now(),
+      };
+      localStorage.setItem("focusflow_active_session", JSON.stringify(sessionData));
+    } else {
+      localStorage.removeItem("focusflow_active_session");
+    }
+  }, [activeTask, timerState, timeMode, secondsRemaining, secondsElapsed]);
+
   return (
     <TimerContext.Provider
       value={{
